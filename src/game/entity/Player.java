@@ -67,7 +67,9 @@ public class Player extends Entity {
         inventory.addItem(Tool.basicHoe());
         inventory.addItem(Tool.basicWateringCan());
         inventory.addItem(Tool.basicScythe());
-        inventory.addItem(Seed.parsnip());
+        inventory.addItem(Seed.stroberi());
+        inventory.addItem(Seed.carrot());
+        inventory.addItem(Seed.potato());
     }
 
     // ── Update (Polymorphism: override dari Entity) ────────
