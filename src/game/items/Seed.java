@@ -5,6 +5,7 @@ import game.world.FarmTile;
 import game.world.Season;
 import game.world.TileMap;
 import game.world.TilePos;
+import game.engine.ImageLoader;
 
 /**
  * SEED — benih yang bisa ditanam di FarmTile yang sudah dicangkul
@@ -23,6 +24,9 @@ public class Seed extends Item {
         this.cropType    = cropType;
         this.growthDays  = growthDays;
         this.validSeason = validSeason;
+        this.icon = ImageLoader.load(
+                "/items/seeds/" + name.toLowerCase().replace(" ", "_") + ".png"
+        );
     }
 
     @Override public boolean isUsable() { return true; }
@@ -42,9 +46,9 @@ public class Seed extends Item {
     }
 
     // ── Factory methods (cara mudah buat seed umum) ───────
-    public static Seed parsnip() { return new Seed("Parsnip Seeds", "Parsnip", 4,  Season.SPRING, 10,  20); }
-    public static Seed melon()   { return new Seed("Melon Seeds",   "Melon",   12, Season.SUMMER, 80,  200); }
-    public static Seed pumpkin() { return new Seed("Pumpkin Seeds", "Pumpkin", 13, Season.FALL,   100, 200); }
+    public static Seed stroberi() { return new Seed("Stroberi Seeds", "Stroberi", 4,  Season.SPRING, 10,  20); }
+    public static Seed carrot()   { return new Seed("Carrot Seeds",   "Carrot",   12, Season.SUMMER, 80,  200); }
+    public static Seed potato() { return new Seed("Potato Seeds", "Potato", 13, Season.FALL,   100, 200); }
 
     // Getter
     public String getCropType()    { return cropType; }
