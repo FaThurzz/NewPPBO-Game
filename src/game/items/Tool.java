@@ -94,9 +94,15 @@ public class Tool extends Item {
                     System.out.println("Belum waktunya panen.");
                 }
             }
-            case AXE, PICKAXE -> {
+            case AXE -> {
                 player.setStamina(player.getStamina() - energyCost);
                 System.out.println(name + " digunakan.");
+            }
+            case PICKAXE -> {
+                if(tileMap.isStone(target)){
+                    player.setStamina(player.getStamina() - energyCost);
+                    System.out.println(name + " digunakan.");
+                }
             }
             case SWORD -> {
                 player.setStamina(player.getStamina() - energyCost);

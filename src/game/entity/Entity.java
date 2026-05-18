@@ -23,6 +23,7 @@ public abstract class Entity implements Renderable, Updatable {
     protected int speed;
     protected BufferedImage sprite;
     protected boolean active = true;
+    protected boolean up1, up2, left1, left2, right1, right2, down1, down2;
 
     protected Entity(int x, int y, int width, int height, int speed) {
         this.x      = x;

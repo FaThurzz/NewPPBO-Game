@@ -108,6 +108,19 @@ public class TileMap {
         return tiles[r][c].getType() == TileType.FARMLAND;
     }
 
+    public boolean isStone(TilePos pos){
+        if (pos == null) return false;
+
+        int r = pos.getRow();
+        int c = pos.getCol();
+
+        if (r < 0 || r >= rows || c < 0 || c >= cols) {
+            return false;
+        }
+
+        return tiles[r][c].getType() == TileType.STONE;
+    }
+
 
     /** Render semua tile yang terlihat di layar */
     public void render(Graphics2D g, Camera cam) {
