@@ -8,7 +8,6 @@ import java.awt.*;
 /**
  * TILE MAP — menyimpan seluruh layout peta dan data FarmTile
  * Konsep OOP: Encapsulation, Exception Handling
- *
  * Merge: ditambahkan farmData (FarmTile[][]) dari versi temanmu
  * agar sistem tanam-siram-panen bisa berjalan.
  */
@@ -153,4 +152,18 @@ public class TileMap {
 
     public int getRows() { return rows; }
     public int getCols() { return cols; }
+
+    /**
+     * Dipanggil oleh TimeSystem.endDay() setiap pergantian hari.
+     * Melakukan loop ke semua tile dan memanggil advanceDay()
+     * pada setiap FarmTile — tanaman yang sudah disiram akan tumbuh.
+     */
+    public void advanceAllFarmTiles() {
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+                farmData[r][c].advanceDay();
+        // advanceDay() sudah ada di FarmTile:
+        // → kalau hasPlant && watered: growStage++
+        // → lalu watered direset ke false
+    }
 }

@@ -105,6 +105,9 @@ public class Player extends Entity {
                 active.use(this, tileMap);
             }
         }
+        if (key.isSellJustPressed()) {
+            sellActiveItem();
+        }
     }
 
     /** Gerak horizontal dengan collision tile + batas map */
@@ -203,7 +206,43 @@ public class Player extends Entity {
         if (hp == 0) System.out.println("Player mati!");
     }
 
-    public void addMoney(int amount) { money += amount; }
+    /**
+     * Jual seluruh item di slot aktif.
+     * Cara kerja:
+     * 1. Ambil item yang sedang aktif di hotbar
+     * 2. Cek apakah item bisa dijual (sellPrice > 0)
+     * 3. Hitung total uang = harga × jumlah item
+     * 4. Tambahkan uang ke player
+     * 5. Hapus item dari inventory
+     * Tool tidak bisa dijual karena sellPrice-nya 0.
+     */
+    private void sellActiveItem() {
+        Inventory inv    = getInventory();
+        Item      active = inv.getActiveItem();
+        // Tidak ada item di slot aktif
+        if (active == null) {
+            System.out.println("Tidak ada item untuk dijual.");
+            return;
+        }
+        // Tool tidak dijual (sellPrice = 0 di constructor Tool)
+        if (active.getSellPrice() <= 0) {
+            System.out.println(active.getName() + " tidak bisa dijual.");
+            return;
+        }
+        // Hitung total uang dari semua item di slot ini
+        // Contoh: 5 Parsnip × $35 = $175
+        int total = active.getSellPrice() * active.getQuantity();
+        // Tambah uang ke player
+        addMoney(total);
+        System.out.println("Jual " + active.getQuantity() + "x "
+                + active.getName() + " → $" + total
+                + " (total uang: $" + getMoney() + ")");
+        // Hapus seluruh item di slot aktif
+        inv.removeAt(inv.getActiveIndex());
+    }
+
+    public void addMoney(int amount) {  // Math.max(0,...) mencegah uang jadi negatif
+        money = Math.max(0, money + amount); }
 
     // ── Getters (Encapsulation) ────────────────────────────
     public int       getHp()         { return hp; }

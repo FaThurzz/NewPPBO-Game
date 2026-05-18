@@ -19,6 +19,9 @@ public class KeyHandler extends KeyAdapter {
     private boolean action;
     private boolean actionWasPressed = false;
     private boolean actionJustPressed = false;
+    private boolean sell;
+    private boolean sellWasPressed  = false;
+    private boolean sellJustPressed = false;
 
     // ── Slot inventory (tombol 1–9) ────────────────────────
     private final boolean[] slot = new boolean[9];
@@ -40,6 +43,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_7 -> slot[6] = true;
             case KeyEvent.VK_8 -> slot[7] = true;
             case KeyEvent.VK_9 -> slot[8] = true;
+            case KeyEvent.VK_F -> sell = true;
         }
     }
 
@@ -60,6 +64,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_7 -> slot[6] = false;
             case KeyEvent.VK_8 -> slot[7] = false;
             case KeyEvent.VK_9 -> slot[8] = false;
+            case KeyEvent.VK_F -> sell = false;
         }
     }
 
@@ -70,6 +75,8 @@ public class KeyHandler extends KeyAdapter {
     public void tick() {
         actionJustPressed = action && !actionWasPressed;
         actionWasPressed  = action;
+        sellJustPressed = sell && !sellWasPressed;
+        sellWasPressed  = sell;
     }
 
     // ── Getters (Encapsulation) ────────────────────────────
@@ -79,4 +86,5 @@ public class KeyHandler extends KeyAdapter {
     public boolean isRight()            { return right; }
     public boolean isActionJustPressed(){ return actionJustPressed; }
     public boolean isSlot(int i)        { return i >= 0 && i < 9 && slot[i]; }
+    public boolean isSellJustPressed() { return sellJustPressed; }
 }

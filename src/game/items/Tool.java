@@ -64,10 +64,31 @@ public class Tool extends Item {
             }
             case SCYTHE -> {
                 if (farm != null && farm.isHarvestable()) {
-                    System.out.println("Panen " + farm.getCropType() + "!");
-                    farm.reset();
-                    player.setStamina(player.getStamina() - energyCost);
-                } else System.out.println("Belum waktunya panen.");
+
+                    // Buat objek Crop berdasarkan nama tanaman yang tersimpan
+                    // di FarmTile. Switch expression mengembalikan objek Crop
+                    // yang sesuai, atau Crop generik jika tidak dikenal.
+                    Crop hasil = switch (farm.getCropType()) {
+                        case "Parsnip" -> new Crop("Parsnip", 35,  10, true);
+                        case "Melon"   -> new Crop("Melon",   250, 25, true);
+                        case "Pumpkin" -> new Crop("Pumpkin", 320, 30, true);
+                        default        -> new Crop(farm.getCropType(), 50, 10, true);
+                    };
+
+                    // Coba masukkan hasil panen ke inventory player.
+                    // addItem() mengembalikan false jika inventory penuh.
+                    boolean masuk = player.getInventory().addItem(hasil);
+
+                    if (masuk) {
+                        System.out.println("Panen " + farm.getCropType() + "!");
+                        farm.reset(); // bersihkan tile setelah panen
+                        player.setStamina(player.getStamina() - energyCost);
+                    } else {
+                        System.out.println("Inventory penuh, tidak bisa panen!");
+                    }
+                } else {
+                    System.out.println("Belum waktunya panen.");
+                }
             }
             case AXE, PICKAXE -> {
                 player.setStamina(player.getStamina() - energyCost);
