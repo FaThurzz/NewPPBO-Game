@@ -5,7 +5,6 @@ import game.world.FarmTile;
 import game.world.TileMap;
 import game.world.TilePos;
 import game.engine.ImageLoader;
-
 /**
  * TOOL — alat seperti cangkul, kaleng air, sabit, dll
  * Konsep OOP: Inheritance, Polymorphism, nested Enum (ToolType)
@@ -23,9 +22,8 @@ public class Tool extends Item {
         this.toolType   = toolType;
         this.energyCost = energyCost;
         this.level      = level;
-        this.icon = ImageLoader.load(
-                "/items/tools/" + name.toLowerCase().replace(" ", "_") + ".png"
-        );
+        this.icon = ImageLoader.load("resources/items/tools/"
+                + name.toLowerCase().replace(" ", "_") + ".png");
     }
 
     private static String descOf(ToolType t) {
