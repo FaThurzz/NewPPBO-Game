@@ -24,9 +24,8 @@ public class Seed extends Item {
         this.cropType    = cropType;
         this.growthDays  = growthDays;
         this.validSeason = validSeason;
-        this.icon = ImageLoader.load(
-                "/items/seeds/" + name.toLowerCase().replace(" ", "_") + ".png"
-        );
+        this.icon = ImageLoader.load("resources/items/seeds/"
+                + name.toLowerCase().replace(" ", "_") + ".png");
     }
 
     @Override public boolean isUsable() { return true; }
