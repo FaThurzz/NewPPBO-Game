@@ -121,6 +121,24 @@ public class TileMap {
         return tiles[r][c].getType() == TileType.STONE;
     }
 
+    public boolean breakStone(TilePos pos) {
+        if (pos == null) return false;
+
+        int r = pos.getRow();
+        int c = pos.getCol();
+
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
+        if (!isStone(pos)) return false;
+
+        // Ganti stone jadi dirt/grass setelah dihancurkan
+        tiles[r][c] = new Tile(TileType.DIRT, null);
+
+        // Kalau tile itu punya data farm, reset juga kalau perlu
+        farmData[r][c].reset();
+
+        return true;
+    }
+
 
     /** Render semua tile yang terlihat di layar */
     public void render(Graphics2D g, Camera cam) {

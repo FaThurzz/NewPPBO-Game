@@ -97,9 +97,13 @@ public class Tool extends Item {
                 System.out.println(name + " digunakan.");
             }
             case PICKAXE -> {
-                if(tileMap.isStone(target)){
-                    player.setStamina(player.getStamina() - energyCost);
-                    System.out.println(name + " digunakan.");
+                if (tileMap.isStone(target)) {
+                    if (tileMap.breakStone(target)) {
+                        player.setStamina(player.getStamina() - energyCost);
+                        System.out.println("Batu hancur!");
+                    }
+                } else {
+                    System.out.println("Tidak ada batu untuk dihancurkan.");
                 }
             }
             case SWORD -> {
