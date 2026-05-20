@@ -93,8 +93,14 @@ public class Tool extends Item {
                 }
             }
             case AXE -> {
-                player.setStamina(player.getStamina() - energyCost);
-                System.out.println(name + " digunakan.");
+                if (tileMap.isLog(target)) {
+                    if(tileMap.cutLog(target)) {
+                        player.setStamina(player.getStamina() - energyCost);
+                        System.out.println("Pohon ditebang!");
+                    }
+                } else {
+                    System.out.println("Tidak ada pohon untuk ditebang.");
+                }
             }
             case PICKAXE -> {
                 if (tileMap.isStone(target)) {

@@ -68,6 +68,7 @@ public class Player extends Entity {
         inventory.addItem(Tool.basicWateringCan());
         inventory.addItem(Tool.basicScythe());
         inventory.addItem(Tool.basicPickaxe());
+        inventory.addItem(Tool.basicAxe());
         inventory.addItem(Seed.stroberi());
         inventory.addItem(Seed.carrot());
         inventory.addItem(Seed.potato());

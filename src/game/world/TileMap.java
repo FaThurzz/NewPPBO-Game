@@ -19,7 +19,7 @@ public class TileMap {
 
     private static final int[][] DEFAULT_MAP = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0},
         {0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,2,2,2,2,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,1,4,4,1,0,0,0,0,0,0,0},
@@ -35,7 +35,7 @@ public class TileMap {
 
     private static final TileType[] TYPE_MAP = {
         TileType.GRASS, TileType.STONE, TileType.WATER,
-        TileType.DIRT,  TileType.FARMLAND, TileType.PATH
+        TileType.DIRT,  TileType.FARMLAND, TileType.PATH, TileType.LOG
     };
 
     /** Constructor normal — bisa throw InvalidMapException */
@@ -119,6 +119,35 @@ public class TileMap {
         }
 
         return tiles[r][c].getType() == TileType.STONE;
+    }
+
+    public boolean isLog(TilePos pos){
+        if (pos == null) return false;
+
+        int r = pos.getRow();
+        int c = pos.getCol();
+
+        if (r < 0 || r >= rows || c < 0 || c >= cols) {
+            return false;
+        }
+
+        return tiles[r][c].getType() == TileType.LOG;
+    }
+
+    public boolean cutLog(TilePos pos){
+        if(pos == null) return false;
+
+        int r = pos.getRow();
+        int c = pos.getCol();
+
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
+        if (!isLog(pos)) return false;
+
+        tiles[r][c] = new Tile(TileType.DIRT, null);
+
+        farmData[r][c].reset();
+
+        return true;
     }
 
     public boolean breakStone(TilePos pos) {
