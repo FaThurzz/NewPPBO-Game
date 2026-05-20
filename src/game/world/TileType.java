@@ -9,6 +9,7 @@ import java.awt.Color;
 public enum TileType {
     GRASS   (true,  new Color(80,  160, 80)),
     DIRT    (true,  new Color(139, 100, 60)),
+    LOG     (false, new Color(128, 50, 38)),
     WATER   (false, new Color(60,  120, 200)),
     STONE   (false, new Color(120, 120, 120)),
     FARMLAND(true,  new Color(100, 70,  40)),
