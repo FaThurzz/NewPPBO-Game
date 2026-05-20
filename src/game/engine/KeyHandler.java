@@ -36,7 +36,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_S, KeyEvent.VK_DOWN  -> down   = true;
             case KeyEvent.VK_A, KeyEvent.VK_LEFT  -> left   = true;
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = true;
-            case KeyEvent.VK_Z, KeyEvent.VK_ENTER -> action = true;
+            case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = true;
             case KeyEvent.VK_F                    -> sell   = true;
             case KeyEvent.VK_1 -> slot[0] = true;
             case KeyEvent.VK_2 -> slot[1] = true;
@@ -57,7 +57,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_S, KeyEvent.VK_DOWN  -> down   = false;
             case KeyEvent.VK_A, KeyEvent.VK_LEFT  -> left   = false;
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = false;
-            case KeyEvent.VK_Z, KeyEvent.VK_ENTER -> action = false;
+            case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = false;
             case KeyEvent.VK_F                    -> sell   = false;
             case KeyEvent.VK_1 -> slot[0] = false;
             case KeyEvent.VK_2 -> slot[1] = false;
