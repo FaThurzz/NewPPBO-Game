@@ -5,6 +5,7 @@ import game.world.FarmTile;
 import game.world.TileMap;
 import game.world.TilePos;
 import game.engine.ImageLoader;
+import game.world.MapManager;
 /**
  * TOOL — alat seperti cangkul, kaleng air, sabit, dll
  * Konsep OOP: Inheritance, Polymorphism, nested Enum (ToolType)

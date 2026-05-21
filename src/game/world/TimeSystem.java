@@ -34,7 +34,7 @@ public class TimeSystem {
      * memanggil advanceAllFarmTiles() saat hari berganti.
      * Ini adalah contoh dependency injection via constructor.
      */
-    private final TileMap tileMap;
+    private TileMap tileMap;
     // ── Listener untuk event pergantian hari ──────────────
     /**
      * DayChangeListener adalah interface sederhana.
@@ -118,6 +118,9 @@ public class TimeSystem {
     // ── Setter listener ────────────────────────────────────
     public void setDayChangeListener(DayChangeListener listener) {
         this.dayChangeListener = listener;
+    }
+    public void setTileMap(TileMap tileMap) {
+        this.tileMap = tileMap;
     }
     // ── Getters ────────────────────────────────────────────
     /**

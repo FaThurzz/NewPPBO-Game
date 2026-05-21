@@ -16,13 +16,14 @@ public class TileMap {
     private Tile[][]     tiles;
     private FarmTile[][] farmData;
     private int rows, cols;
+    private MapManager.MapType currentMapType;
 
     private static final int[][] DEFAULT_MAP = {
+        {0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0},
         {0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,2,2,2,2,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,1,4,4,1,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,1,4,4,1,0,0,6,6,0,0,0},
         {0,0,0,4,4,4,0,0,0,1,4,4,1,0,0,0,0,0,0,0},
         {0,0,0,4,4,4,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -32,10 +33,26 @@ public class TileMap {
         {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
     };
     // 0=GRASS, 1=STONE, 2=WATER, 3=DIRT, 4=FARMLAND, 5=PATH
+    private static final int[][] CAVE_MAP = {
+        {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,1,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9},
+        {9,8,8,8,8,8,8,8,8,7,8,8,8,8,8,8,8,8,8,9},
+        {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
+    };
+
 
     private static final TileType[] TYPE_MAP = {
         TileType.GRASS, TileType.STONE, TileType.WATER,
-        TileType.DIRT,  TileType.FARMLAND, TileType.PATH, TileType.LOG
+        TileType.DIRT,  TileType.FARMLAND, TileType.PATH, TileType.LOG, TileType.ENTRANCE,
+        TileType.PASSABLESTONE, TileType.UNBREAKSTONE
     };
 
     /** Constructor normal — bisa throw InvalidMapException */
@@ -43,17 +60,36 @@ public class TileMap {
         loadMap(DEFAULT_MAP);
     }
 
+
     /** Constructor fallback — dipakai jika constructor normal gagal */
     public TileMap(boolean useFallback) {
-        rows = 12; cols = 20;
-        tiles    = new Tile[rows][cols];
-        farmData = new FarmTile[rows][cols];
-        for (int r = 0; r < rows; r++)
-            for (int c = 0; c < cols; c++) {
-                tiles[r][c]    = new Tile(TileType.GRASS, null);
-                farmData[r][c] = new FarmTile();
+        if (useFallback) {
+            try {
+                loadMap(CAVE_MAP);
+            } catch (InvalidMapException e) {
+                // fallback safe: set default empty grass
+                rows = 12; cols = 20;
+                tiles    = new Tile[rows][cols];
+                farmData = new FarmTile[rows][cols];
+                for (int r = 0; r < rows; r++)
+                    for (int c = 0; c < cols; c++) {
+                        tiles[r][c]    = new Tile(TileType.GRASS, null);
+                        farmData[r][c] = new FarmTile();
+                    }
             }
+        } else {
+            // sama seperti sekarang: default lawn
+            rows = 12; cols = 20;
+            tiles    = new Tile[rows][cols];
+            farmData = new FarmTile[rows][cols];
+            for (int r = 0; r < rows; r++)
+                for (int c = 0; c < cols; c++) {
+                    tiles[r][c]    = new Tile(TileType.GRASS, null);
+                    farmData[r][c] = new FarmTile();
+                }
+        }
     }
+
 
     private void loadMap(int[][] mapData) throws InvalidMapException {
         if (mapData == null || mapData.length == 0)
@@ -80,6 +116,10 @@ public class TileMap {
         }
     }
 
+    public void setMapType(MapManager.MapType type) {
+        this.currentMapType = type;
+    }
+
     /** Apakah tile di posisi ini bisa dilewati? */
     public boolean isPassable(int col, int row) {
         if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
@@ -94,6 +134,22 @@ public class TileMap {
         }
         return farmData[r][c];
     }
+
+    /**
+     * Cari posisi entrance di map
+     * @return TilePos entrance, atau null jika tidak ada
+     */
+    public TilePos findEntrance() {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (tiles[r][c].getType() == TileType.ENTRANCE) {
+                    return new TilePos(c, r);
+                }
+            }
+        }
+        return null; // Tidak ada entrance
+    }
+
 
     public boolean isFarmland(TilePos pos) {
         if (pos == null) return false;
@@ -159,13 +215,29 @@ public class TileMap {
         if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
         if (!isStone(pos)) return false;
 
-        // Ganti stone jadi dirt/grass setelah dihancurkan
-        tiles[r][c] = new Tile(TileType.DIRT, null);
+        // Cek tipe map saat ini
+        MapManager.MapType type = (currentMapType != null)
+                ? currentMapType
+                : MapManager.MapType.OVERWORLD;
 
-        // Kalau tile itu punya data farm, reset juga kalau perlu
+        if (type == MapManager.MapType.OVERWORLD) {
+            tiles[r][c] = new Tile(TileType.DIRT, null);
+        } else {
+            tiles[r][c] = new Tile(TileType.PASSABLESTONE, null);
+        }
+
+        // Reset farm data jika ada
         farmData[r][c].reset();
 
         return true;
+    }
+
+    public boolean isEntrance(TilePos pos) {
+        if (pos == null) return false;
+        int r = pos.getRow();
+        int c = pos.getCol();
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
+        return tiles[r][c].getType() == TileType.ENTRANCE;
     }
 
 

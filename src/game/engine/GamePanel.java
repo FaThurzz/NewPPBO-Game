@@ -5,6 +5,8 @@ import game.exception.InvalidMapException;
 import game.items.InventoryRenderer;
 import game.world.Camera;
 import game.world.TileMap;
+import game.world.TilePos;
+import game.world.MapManager;
 import game.world.TimeSystem;
 
 import javax.swing.*;
@@ -35,6 +37,7 @@ public class GamePanel extends JPanel {
     private final KeyHandler keyHandler = new KeyHandler();
     private final Camera camera = new Camera();
     private TimeSystem timeSystem;
+    private MapManager mapManager;
     private TileMap tileMap;
     private Player player;
     private String  notifText    = "";
@@ -56,6 +59,8 @@ public class GamePanel extends JPanel {
             tileMap = new TileMap(true); // fallback map kosong
         }
 
+        mapManager = new MapManager();
+        tileMap = mapManager.getCurrentMap();
         player = new Player(keyHandler, tileMap);
         timeSystem = new TimeSystem(tileMap);
         timeSystem.setDayChangeListener((newDay, season) -> {
@@ -82,6 +87,21 @@ public class GamePanel extends JPanel {
 
     private void update() {
         player.update();
+        if (keyHandler.isEntranceJustPressed()) {
+            TilePos target = player.getFacingTile();
+            if (tileMap.isEntrance(target)) {
+                // sedang di overworld => masuk cave
+                if (mapManager.getCurrentMapType() == MapManager.MapType.OVERWORLD) {
+                    mapManager.enterCave(player);
+                } else {
+                    mapManager.exitCave(player);
+                }
+                // update referensi tileMap di GamePanel dan TimeSystem
+                tileMap = mapManager.getCurrentMap();
+                player.setTileMap(tileMap);
+                timeSystem.setTileMap(tileMap); // lihat catatan di bawah
+            }
+        }
         camera.follow(player, tileMap);
         timeSystem.update();
         if (notifTimer > 0) notifTimer--;

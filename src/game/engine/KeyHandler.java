@@ -26,6 +26,11 @@ public class KeyHandler extends KeyAdapter {
     private boolean sellWasPressed  = false;
     private boolean sellJustPressed = false;
 
+    // Entrance (Enter)
+    private boolean entrance;
+    private boolean wasEntrance = false;
+    private boolean justEntrance = false;
+
     // ── Slot inventory (tombol 1-9) ────────────────────────
     private final boolean[] slot = new boolean[9];
 
@@ -38,6 +43,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = true;
             case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = true;
             case KeyEvent.VK_F                    -> sell   = true;
+            case KeyEvent.VK_ENTER -> entrance = true;
             case KeyEvent.VK_1 -> slot[0] = true;
             case KeyEvent.VK_2 -> slot[1] = true;
             case KeyEvent.VK_3 -> slot[2] = true;
@@ -59,6 +65,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = false;
             case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = false;
             case KeyEvent.VK_F                    -> sell   = false;
+            case KeyEvent.VK_ENTER -> entrance = false;
             case KeyEvent.VK_1 -> slot[0] = false;
             case KeyEvent.VK_2 -> slot[1] = false;
             case KeyEvent.VK_3 -> slot[2] = false;
@@ -81,6 +88,9 @@ public class KeyHandler extends KeyAdapter {
 
         sellJustPressed = sell && !sellWasPressed;
         sellWasPressed  = sell;
+
+        justEntrance = entrance && !wasEntrance;
+        wasEntrance = entrance;
     }
 
     // ── Getters (Encapsulation) ────────────────────────────
@@ -88,6 +98,7 @@ public class KeyHandler extends KeyAdapter {
     public boolean isDown()              { return down; }
     public boolean isLeft()              { return left; }
     public boolean isRight()             { return right; }
+    public boolean isEntranceJustPressed(){ return justEntrance; }
     public boolean isActionJustPressed() { return actionJustPressed; }
     public boolean isSellJustPressed()   { return sellJustPressed; }
     public boolean isSlot(int i)         { return i >= 0 && i < 9 && slot[i]; }

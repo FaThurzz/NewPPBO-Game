@@ -38,7 +38,7 @@ public class Player extends Entity {
 
     // ── Input & map ───────────────────────────────────────
     private final KeyHandler key;
-    private final TileMap    tileMap;
+    private TileMap    tileMap;
 
     // ── Animasi ───────────────────────────────────────────
     private String  direction = "down";
@@ -191,6 +191,10 @@ public class Player extends Entity {
             case "right" -> new TilePos(col + 1, row);
             default      -> new TilePos(col, row);
         };
+    }
+
+    public void setTileMap(TileMap tileMap) {
+        this.tileMap = tileMap;
     }
 
     // ── Stat methods ──────────────────────────────────────
