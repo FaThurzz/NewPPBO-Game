@@ -64,11 +64,11 @@ public class Player extends Entity {
         this.money       = 500;
 
         // Item awal di inventory
-        inventory.addItem(Tool.basicHoe());
-        inventory.addItem(Tool.basicWateringCan());
-        inventory.addItem(Tool.basicScythe());
-        inventory.addItem(Tool.basicPickaxe());
-        inventory.addItem(Tool.basicAxe());
+        inventory.addItem(Tool.Hoe());
+        inventory.addItem(Tool.WateringCan());
+        inventory.addItem(Tool.Scythe());
+        inventory.addItem(Tool.Pickaxe());
+        inventory.addItem(Tool.Axe());
         inventory.addItem(Seed.stroberi());
         inventory.addItem(Seed.carrot());
         inventory.addItem(Seed.potato());

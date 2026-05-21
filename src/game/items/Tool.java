@@ -5,7 +5,7 @@ import game.world.FarmTile;
 import game.world.TileMap;
 import game.world.TilePos;
 import game.engine.ImageLoader;
-import game.world.MapManager;
+
 /**
  * TOOL — alat seperti cangkul, kaleng air, sabit, dll
  * Konsep OOP: Inheritance, Polymorphism, nested Enum (ToolType)
@@ -36,6 +36,25 @@ public class Tool extends Item {
             case SCYTHE       -> "Memanen tanaman yang sudah matang.";
             case SWORD        -> "Senjata untuk bertarung.";
         };
+    }
+
+    private static String tierOf(int level) {
+        if (level >= 25) return "Legendary";
+        if (level >= 20) return "Epic";
+        if (level >= 15) return "Rare";
+        if (level >= 10) return "Uncommon";
+        if (level >= 5)  return "Common";
+        if (level >= 0)  return "Basic";
+        return "Unknown";
+    }
+
+    public String getTierName() {
+        return tierOf(this.level);
+    }
+
+    @Override
+    public String getTooltip() {
+        return super.getTooltip() + "\nTier: " + getTierName();
     }
 
     @Override public boolean isUsable() { return true; }
@@ -121,12 +140,12 @@ public class Tool extends Item {
     }
 
     // ── Factory methods ───────────────────────────────────
-    public static Tool basicHoe()         { return new Tool("Basic Hoe",        ToolType.HOE,          2, 1); }
-    public static Tool basicWateringCan() { return new Tool("Watering Can",     ToolType.WATERING_CAN, 2, 1); }
-    public static Tool basicScythe()      { return new Tool("Scythe",           ToolType.SCYTHE,       1, 1); }
-    public static Tool basicAxe()         { return new Tool("Basic Axe",        ToolType.AXE,          4, 1); }
-    public static Tool basicPickaxe()     { return new Tool("Basic Pickaxe",    ToolType.PICKAXE,      4, 1); }
-    public static Tool basicSword()       { return new Tool("Basic Sword",      ToolType.SWORD,        4, 1); }
+    public static Tool Hoe()         { return new Tool("Hoe",        ToolType.HOE,          2, 0); }
+    public static Tool WateringCan() { return new Tool("Watering Can",     ToolType.WATERING_CAN, 2, 0); }
+    public static Tool Scythe()      { return new Tool("Scythe",           ToolType.SCYTHE,       1, 0); }
+    public static Tool Axe()         { return new Tool("Axe",        ToolType.AXE,          4, 0); }
+    public static Tool Pickaxe()     { return new Tool("Pickaxe",    ToolType.PICKAXE,      4, 0); }
+    public static Tool Sword()       { return new Tool("Sword",      ToolType.SWORD,        4, 0); }
 
     // Getter
     public ToolType getToolType()  { return toolType; }

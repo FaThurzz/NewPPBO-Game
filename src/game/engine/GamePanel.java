@@ -3,6 +3,8 @@ package game.engine;
 import game.entity.Player;
 import game.exception.InvalidMapException;
 import game.items.InventoryRenderer;
+import game.items.Item;
+import game.items.Tool;
 import game.world.Camera;
 import game.world.TileMap;
 import game.world.TilePos;
@@ -201,8 +203,14 @@ public class GamePanel extends JPanel {
         g2.setColor(new Color(200, 200, 200));
         g2.setFont(new Font("Courier New", Font.PLAIN, 9));
         if (player.getInventory().getActiveItem() != null) {
-            g2.drawString(player.getInventory().getActiveItem().getName(), 12, 66);
+            Item active = player.getInventory().getActiveItem();
+            String extra = "";
+            if (active instanceof Tool) {
+                extra = " (" + ((Tool) active).getTierName() + ")";
+            }
+            g2.drawString(active.getName() + extra, 12, 66);
         }
+
 
         // Petunjuk tombol jual
         g2.setColor(new Color(160, 160, 160));
