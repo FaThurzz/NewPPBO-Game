@@ -1,7 +1,7 @@
 package game;
 
 import game.engine.GamePanel;
-import javax.swing.JFrame;
+import javax.swing.JFrame;  
 import javax.swing.SwingUtilities;
 
 /**

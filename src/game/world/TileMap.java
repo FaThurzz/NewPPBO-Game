@@ -2,6 +2,9 @@ package game.world;
 
 import game.engine.GamePanel;
 import game.exception.InvalidMapException;
+import game.engine.ImageLoader;
+import java.awt.image.BufferedImage;
+
 
 import java.awt.*;
 
@@ -17,6 +20,20 @@ public class TileMap {
     private FarmTile[][] farmData;
     private int rows, cols;
     private MapManager.MapType currentMapType;
+    private static final BufferedImage GRASS_IMG     = ImageLoader.load("resources/items/worlds/overworld/grass.png");
+    private static final BufferedImage STONE_OVW_IMG     = ImageLoader.load("resources/items/worlds/overworld/stone_ovw.png");
+    private static final BufferedImage STONE_CAVE_IMG     = ImageLoader.load("resources/items/worlds/cave/stone_cave.png");
+    private static final BufferedImage WATER_IMG     = ImageLoader.load("resources/items/worlds/overworld/water.png");
+    private static final BufferedImage DIRT_IMG      = ImageLoader.load("resources/items/worlds/overworld/dirt.png");
+    private static final BufferedImage FARMLAND_IMG  = ImageLoader.load("resources/items/worlds/overworld/farmland.png");
+    private static final BufferedImage PATH_IMG      = ImageLoader.load("resources/items/worlds/overworld/path.png");
+    private static final BufferedImage LOG_IMG       = ImageLoader.load("resources/items/worlds/overworld/log.png");
+    private static final BufferedImage ENTRANCE_IMG  = ImageLoader.load("resources/items/worlds/overworld/entrance.png");
+    private static final BufferedImage STONEUNBREAK_IMG = ImageLoader.load("resources/items/worlds/cave/stone_unbreak.png");
+    private static final BufferedImage PASSSTONE_A_IMG =
+            ImageLoader.load("resources/items/worlds/cave/stone_passable_a.png");
+    private static final BufferedImage PASSSTONE_B_IMG =
+            ImageLoader.load("resources/items/worlds/cave/stone_passable_b.png");
 
     private static final int[][] DEFAULT_MAP = {
         {0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0},
@@ -57,14 +74,15 @@ public class TileMap {
 
     /** Constructor normal — bisa throw InvalidMapException */
     public TileMap() throws InvalidMapException {
+        this.currentMapType = MapManager.MapType.OVERWORLD;
         loadMap(DEFAULT_MAP);
     }
-
 
     /** Constructor fallback — dipakai jika constructor normal gagal */
     public TileMap(boolean useFallback) {
         if (useFallback) {
             try {
+                this.currentMapType = MapManager.MapType.CAVE;
                 loadMap(CAVE_MAP);
             } catch (InvalidMapException e) {
                 // fallback safe: set default empty grass
@@ -73,7 +91,8 @@ public class TileMap {
                 farmData = new FarmTile[rows][cols];
                 for (int r = 0; r < rows; r++)
                     for (int c = 0; c < cols; c++) {
-                        tiles[r][c]    = new Tile(TileType.GRASS, null);
+                        tiles[r][c] = new Tile(TileType.GRASS, GRASS_IMG);
+
                         farmData[r][c] = new FarmTile();
                     }
             }
@@ -84,7 +103,8 @@ public class TileMap {
             farmData = new FarmTile[rows][cols];
             for (int r = 0; r < rows; r++)
                 for (int c = 0; c < cols; c++) {
-                    tiles[r][c]    = new Tile(TileType.GRASS, null);
+                    tiles[r][c] = new Tile(TileType.GRASS, GRASS_IMG);
+
                     farmData[r][c] = new FarmTile();
                 }
         }
@@ -110,7 +130,8 @@ public class TileMap {
                 int id = mapData[r][c];
                 if (id < 0 || id >= TYPE_MAP.length)
                     throw new InvalidMapException("ID tile tidak dikenal: " + id);
-                tiles[r][c]    = new Tile(TYPE_MAP[id], null);
+                TileType type = TYPE_MAP[id];
+                tiles[r][c] = new Tile(type, textureOf(type, r, c));
                 farmData[r][c] = new FarmTile();
             }
         }
@@ -118,6 +139,21 @@ public class TileMap {
 
     public void setMapType(MapManager.MapType type) {
         this.currentMapType = type;
+    }
+
+    private BufferedImage textureOf(TileType type, int row, int col) {
+        return switch (type) {
+            case GRASS -> GRASS_IMG;
+            case STONE -> currentMapType == MapManager.MapType.OVERWORLD ? STONE_OVW_IMG : STONE_CAVE_IMG;
+            case WATER -> WATER_IMG;
+            case DIRT -> DIRT_IMG;
+            case FARMLAND -> FARMLAND_IMG;
+            case PATH -> PATH_IMG;
+            case LOG -> LOG_IMG;
+            case ENTRANCE -> ENTRANCE_IMG;
+            case UNBREAKSTONE -> STONEUNBREAK_IMG;
+            case PASSABLESTONE -> ((row + col) & 1) == 0 ? PASSSTONE_A_IMG : PASSSTONE_B_IMG;
+        };
     }
 
     /** Apakah tile di posisi ini bisa dilewati? */
@@ -199,7 +235,7 @@ public class TileMap {
         if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
         if (!isLog(pos)) return false;
 
-        tiles[r][c] = new Tile(TileType.DIRT, null);
+        tiles[r][c] = new Tile(TileType.DIRT, DIRT_IMG);
 
         farmData[r][c].reset();
 
@@ -221,9 +257,10 @@ public class TileMap {
                 : MapManager.MapType.OVERWORLD;
 
         if (type == MapManager.MapType.OVERWORLD) {
-            tiles[r][c] = new Tile(TileType.DIRT, null);
+            tiles[r][c] = new Tile(TileType.GRASS, GRASS_IMG);
         } else {
-            tiles[r][c] = new Tile(TileType.PASSABLESTONE, null);
+            tiles[r][c] = new Tile(TileType.PASSABLESTONE, textureOf(TileType.PASSABLESTONE, r, c));
+
         }
 
         // Reset farm data jika ada
