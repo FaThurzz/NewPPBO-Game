@@ -13,17 +13,15 @@ import java.awt.*;
 
 /**
  * CLASS: Player
- *
  * Konsep OOP:
  * 1. Inheritance  — extends Entity
  * 2. Polymorphism — override update() dan render()
  * 3. Encapsulation — stats private dengan getter/setter
- *
  * Merge:
- * - Stamina system dari versi temanmu
- * - Inventory + item usage dari versi temanmu
+ * - Stamina system
+ * - Inventory + item usage
  * - getFacingTile() untuk interaksi tile (cangkul, tanam, siram, panen)
- * - Collision dengan batas map dari versi temanmu
+ * - Collision dengan batas map
  * - Getter/setter dari versi simplified
  */
 public class Player extends Entity {
@@ -77,40 +75,79 @@ public class Player extends Entity {
     // ── Update (Polymorphism: override dari Entity) ────────
     @Override
     public void update() {
-        int dx = 0, dy = 0;
-        moving = false;
+        key.tick();
 
-        if (key.isUp())    { dy = -getSpeed(); direction = "up";    moving = true; }
-        if (key.isDown())  { dy =  getSpeed(); direction = "down";  moving = true; }
-        if (key.isLeft())  { dx = -getSpeed(); direction = "left";  moving = true; }
-        if (key.isRight()) { dx =  getSpeed(); direction = "right"; moving = true; }
+        if (inventory.isBackpackOpen()) {
+            // ── Backpack TERBUKA → arrow untuk navigasi baris ──
+            // Arrow up/down TIDAK menggerakkan player
+            if (key.isUpJust())   inventory.backpackRowUp();
+            if (key.isDownJust()) inventory.backpackRowDown();
 
-        if (dx != 0) moveX(dx);
-        if (dy != 0) moveY(dy);
-
-        // Animasi berjalan
-        if (moving) {
-            animTimer++;
-            if (animTimer >= 10) { animTimer = 0; animFrame = (animFrame + 1) % 4; }
-        } else {
-            animFrame = 0;
-        }
-
-        // Pilih slot inventory dengan tombol 1-9
-        for (int i = 0; i < 9; i++) {
-            if (key.isSlot(i)) inventory.setActiveIndex(i);
-        }
-
-        // Gunakan item aktif dengan Z / Enter
-        key.tick(); // hitung actionJustPressed
-        if (key.isActionJustPressed()) {
-            Item active = inventory.getActiveItem();
-            if (active != null && active.isUsable()) {
-                active.use(this, tileMap);
+            // 1-9 → pilih kolom
+            for (int i = 0; i < 9; i++) {
+                if (key.isSlot(i)) inventory.setBackpackActiveCol(i);
             }
+
+            // Z → pakai item backpack
+            if (key.isActionJustPressed()) {
+                int  idx    = inventory.getBackpackActiveIndex();
+                Item active = inventory.getBackpackActiveItem();
+                if (active != null && active.isUsable()) {
+                    active.use(this, tileMap);
+                    if (active.getQuantity() <= 0) {
+                        inventory.removeBackpackAt(idx);
+                    }
+                }
+            }
+
+            // F → jual item backpack
+            if (key.isSellJustPressed()) sellBackpackItem();
+
+        } else {
+            // ── Backpack TERTUTUP → arrow untuk gerak player ──
+            int dx = 0, dy = 0;
+            moving = false;
+
+            if (key.isUp())    { dy = -getSpeed(); direction = "up";    moving = true; }
+            if (key.isDown())  { dy =  getSpeed(); direction = "down";  moving = true; }
+            if (key.isLeft())  { dx = -getSpeed(); direction = "left";  moving = true; }
+            if (key.isRight()) { dx =  getSpeed(); direction = "right"; moving = true; }
+
+            if (dx != 0) moveX(dx);
+            if (dy != 0) moveY(dy);
+
+            // Animasi
+            if (moving) {
+                animTimer++;
+                if (animTimer >= 10) { animTimer = 0; animFrame = (animFrame + 1) % 4; }
+            } else {
+                animFrame = 0;
+            }
+
+            // 1-9 → pilih slot hotbar
+            for (int i = 0; i < 9; i++) {
+                if (key.isSlot(i)) inventory.setActiveIndex(i);
+            }
+
+            // Z → pakai item hotbar
+            if (key.isActionJustPressed()) {
+                int  idx    = inventory.getActiveIndex();
+                Item active = inventory.getActiveItem();
+                if (active != null && active.isUsable()) {
+                    active.use(this, tileMap);
+                    if (active.getQuantity() <= 0) {
+                        inventory.removeAt(idx);
+                    }
+                }
+            }
+
+            // F → jual item hotbar
+            if (key.isSellJustPressed()) sellActiveItem();
         }
-        if (key.isSellJustPressed()) {
-            sellActiveItem();
+
+        // I → buka/tutup backpack (selalu aktif)
+        if (key.isInventoryJustPressed()) {
+            inventory.toggleBackpack();
         }
     }
 
@@ -247,6 +284,25 @@ public class Player extends Entity {
                 + " (total uang: $" + getMoney() + ")");
         // Hapus seluruh item di slot aktif
         inv.removeAt(inv.getActiveIndex());
+    }
+    private void sellBackpackItem() {
+        int  idx    = inventory.getBackpackActiveIndex();
+        Item active = inventory.getBackpackActiveItem();
+
+        if (active == null) {
+            System.out.println("Tidak ada item di slot ini.");
+            return;
+        }
+        if (active.getSellPrice() <= 0) {
+            System.out.println(active.getName() + " tidak bisa dijual.");
+            return;
+        }
+
+        int total = active.getSellPrice() * active.getQuantity();
+        addMoney(total);
+        System.out.println("Jual " + active.getQuantity() + "x "
+                + active.getName() + " → $" + total);
+        inventory.removeBackpackAt(idx);
     }
 
     public void addMoney(int amount) {  // Math.max(0,...) mencegah uang jadi negatif

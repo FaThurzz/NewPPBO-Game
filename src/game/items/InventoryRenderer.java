@@ -67,7 +67,60 @@ public class InventoryRenderer {
             g.drawString(qty, x + SLOT_SIZE - 6 - qty.length() * 5, y + SLOT_SIZE - 4);
         }
     }
+    public static void renderBackpack(Graphics2D g, Inventory inv) {
+        if (!inv.isBackpackOpen()) return; // tidak digambar kalau tertutup
 
+        int cols    = 9;
+        int rows    = 3;
+        int panelW  = cols * (SLOT_SIZE + SLOT_MARGIN) - SLOT_MARGIN + 20;
+        int panelH  = rows * (SLOT_SIZE + SLOT_MARGIN) - SLOT_MARGIN + 30;
+        int panelX  = (GamePanel.SCREEN_WIDTH  - panelW) / 2;
+        int panelY  = (GamePanel.SCREEN_HEIGHT - panelH) / 2 - 20; // tengah layar
+
+        // Background panel
+        g.setColor(new Color(30, 20, 10, 220));
+        g.fillRoundRect(panelX, panelY, panelW, panelH, 12, 12);
+
+        // Border
+        g.setColor(new Color(180, 140, 80));
+        g.setStroke(new BasicStroke(2f));
+        g.drawRoundRect(panelX, panelY, panelW, panelH, 12, 12);
+        g.setStroke(new BasicStroke(1f));
+
+        // Judul + petunjuk tombol
+        g.setColor(new Color(255, 220, 60));
+        g.setFont(new Font("Courier New", Font.BOLD, 11));
+        g.drawString("Backpack", panelX + 10, panelY + 16);
+        g.setColor(new Color(160, 160, 160));
+        g.setFont(new Font("Courier New", Font.PLAIN, 9));
+        g.drawString("[1-9] Pilih Kolom  [↑↓] Pindah Baris  [Z] Pakai  [F] Jual  [I] Tutup",
+                panelX + 10, panelY + panelH - 6);
+
+        // Render tiap slot backpack
+        int activeRow = inv.getBackpackActiveRow();
+        int activeCol = inv.getBackpackActiveCol();
+        for (int i = 0; i < Inventory.BACKPACK_SIZE; i++) {
+            int col   = i % cols;
+            int row   = i / cols;
+            int slotX = panelX + 10 + col * (SLOT_SIZE + SLOT_MARGIN);
+            int slotY = panelY + 22 + row * (SLOT_SIZE + SLOT_MARGIN);
+            boolean isActive = (col == activeCol && row == activeRow);
+            drawSlot(g, slotX, slotY, false);
+            // Highlight seluruh baris aktif dengan warna berbeda
+            if (row == activeRow && !isActive) {
+                g.setColor(new Color(255, 220, 60, 30)); // kuning transparan
+                g.fillRoundRect(slotX + 1, slotY + 1,
+                        SLOT_SIZE - 2, SLOT_SIZE - 2, 4, 4);
+            }
+            Item item = inv.getBackpackItem(i);
+            if (item != null) drawItemInSlot(g, item, slotX, slotY);
+        }
+        int arrowY = panelY + 22 + activeRow * (SLOT_SIZE + SLOT_MARGIN)
+                + SLOT_SIZE / 2;
+        g.setColor(new Color(255, 220, 60));
+        g.setFont(new Font("Courier New", Font.BOLD, 12));
+        g.drawString("►", panelX - 2, arrowY + 4);
+    }
     private static Color colorOf(ItemType type) {
         return switch (type) {
             case SEED     -> new Color(120, 200, 80);

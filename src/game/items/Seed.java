@@ -19,8 +19,9 @@ public class Seed extends Item {
 
     public Seed(String name, String cropType,
                 int growthDays, Season validSeason,
-                int sellPrice, int buyPrice) {
+                int sellPrice, int buyPrice, int quantity) {
         super(name, "Benih " + cropType, ItemType.SEED, 99, sellPrice, buyPrice);
+        this.quantity  = quantity;
         this.cropType    = cropType;
         this.growthDays  = growthDays;
         this.validSeason = validSeason;
@@ -45,9 +46,9 @@ public class Seed extends Item {
     }
 
     // ── Factory methods (cara mudah buat seed umum) ───────
-    public static Seed stroberi() { return new Seed("Stroberi Seeds", "Stroberi", 4,  Season.SPRING, 10,  20); }
-    public static Seed carrot()   { return new Seed("Carrot Seeds",   "Carrot",   12, Season.SUMMER, 80,  200); }
-    public static Seed potato() { return new Seed("Potato Seeds", "Potato", 13, Season.FALL,   100, 200); }
+    public static Seed stroberi() { return new Seed("Stroberi Seeds", "Stroberi", 4,  Season.SPRING, 10,  20, 50); }
+    public static Seed carrot()   { return new Seed("Carrot Seeds",   "Carrot",   12, Season.SUMMER, 80,  200, 50); }
+    public static Seed potato() { return new Seed("Potato Seeds", "Potato", 13, Season.FALL,   100, 200, 50); }
 
     // Getter
     public String getCropType()    { return cropType; }
