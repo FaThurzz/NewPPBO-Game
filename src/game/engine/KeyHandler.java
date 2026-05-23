@@ -33,6 +33,13 @@ public class KeyHandler extends KeyAdapter {
 
     // ── Slot inventory (tombol 1-9) ────────────────────────
     private final boolean[] slot = new boolean[9];
+    private boolean inventoryPressed;
+    private boolean inventoryWasPressed  = false;
+    private boolean inventoryJustPressed = false;
+
+    // ── Slot backpack (tombol 1-9) ────────────────────────
+    private boolean upWas  = false, downWas  = false;
+    private boolean upJust = false, downJust = false;
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -43,6 +50,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = true;
             case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = true;
             case KeyEvent.VK_F                    -> sell   = true;
+            case KeyEvent.VK_I -> inventoryPressed = true;
             case KeyEvent.VK_ENTER -> entrance = true;
             case KeyEvent.VK_1 -> slot[0] = true;
             case KeyEvent.VK_2 -> slot[1] = true;
@@ -65,6 +73,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> right  = false;
             case KeyEvent.VK_E, KeyEvent.VK_SPACE -> action = false;
             case KeyEvent.VK_F                    -> sell   = false;
+            case KeyEvent.VK_I -> inventoryPressed = false;
             case KeyEvent.VK_ENTER -> entrance = false;
             case KeyEvent.VK_1 -> slot[0] = false;
             case KeyEvent.VK_2 -> slot[1] = false;
@@ -91,6 +100,14 @@ public class KeyHandler extends KeyAdapter {
 
         justEntrance = entrance && !wasEntrance;
         wasEntrance = entrance;
+
+        inventoryJustPressed = inventoryPressed && !inventoryWasPressed;
+        inventoryWasPressed  = inventoryPressed;
+
+        upJust   = up   && !upWas;
+        upWas    = up;
+        downJust = down && !downWas;
+        downWas  = down;
     }
 
     // ── Getters (Encapsulation) ────────────────────────────
@@ -101,5 +118,8 @@ public class KeyHandler extends KeyAdapter {
     public boolean isEntranceJustPressed(){ return justEntrance; }
     public boolean isActionJustPressed() { return actionJustPressed; }
     public boolean isSellJustPressed()   { return sellJustPressed; }
+    public boolean isInventoryJustPressed() { return inventoryJustPressed; }
     public boolean isSlot(int i)         { return i >= 0 && i < 9 && slot[i]; }
+    public boolean isUpJust()   { return upJust; }
+    public boolean isDownJust() { return downJust; }
 }

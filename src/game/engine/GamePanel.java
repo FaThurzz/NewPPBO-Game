@@ -131,15 +131,13 @@ public class GamePanel extends JPanel {
 
         // 1. Render peta
         tileMap.render(g2, camera);
-
         // 2. Render player (Polymorphism: render() via interface Renderable)
         player.render(g2, camera.x, camera.y);
-
         // 3. HUD
         renderHUD(g2);
-
         // 4. Hotbar inventory (dari versi temanmu)
         InventoryRenderer.renderHotbar(g2, player.getInventory());
+        InventoryRenderer.renderBackpack(g2, player.getInventory()); // ← HARUS PALING BAWAH
 
         if (notifTimer > 0) {
             // Hitung opacity: mulai solid, makin transparan menjelang habis
