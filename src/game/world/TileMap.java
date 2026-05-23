@@ -277,27 +277,6 @@ public class TileMap {
         return tiles[r][c].getType() == TileType.ENTRANCE;
     }
 
-
-    /** Render semua tile yang terlihat di layar */
-    public void render(Graphics2D g, Camera cam) {
-        int ts = GamePanel.TILE_SCALED;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                int sx = c * ts - cam.x;
-                int sy = r * ts - cam.y;
-                if (sx + ts < 0 || sx > GamePanel.SCREEN_WIDTH)  continue;
-                if (sy + ts < 0 || sy > GamePanel.SCREEN_HEIGHT) continue;
-                tiles[r][c].render(g, sx, sy, ts);
-
-                // Tampilkan indikator visual FarmTile jika sudah dicangkul
-                FarmTile farm = farmData[r][c];
-                if (farm.isTilled()) {
-                    renderFarmOverlay(g, farm, sx, sy, ts);
-                }
-            }
-        }
-    }
-
     /** Gambar overlay di atas tile pertanian (tilled, watered, tanaman) */
     private void renderFarmOverlay(Graphics2D g, FarmTile farm, int x, int y, int size) {
         // Overlay tanah yang sudah dicangkul
@@ -317,6 +296,50 @@ public class TileMap {
             int ph = 8 + stage * 6; // makin tinggi sesuai stage
             g.fillRect(x + size/2 - 3, y + size - ph - 4, 6, ph);
         }
+    }
+
+    public void render(Graphics2D g, Camera cam) {
+        int ts = GamePanel.TILE_SCALED;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                int sx = c * ts - cam.x;
+                int sy = r * ts - cam.y;
+                if (sx + ts < 0 || sx > GamePanel.SCREEN_WIDTH)  continue;
+                if (sy + ts < 0 || sy > GamePanel.SCREEN_HEIGHT) continue;
+                tiles[r][c].render(g, sx, sy, ts);
+
+                FarmTile farm = farmData[r][c];
+                if (farm.isTilled()) {
+                    renderFarmOverlay(g, farm, sx, sy, ts);
+                }
+            }
+        }
+        renderWaterAsOne(g, cam);
+    }
+
+    private void renderWaterAsOne(Graphics2D g, Camera cam) {
+        if (WATER_IMG == null) return;
+        int ts = GamePanel.TILE_SCALED;
+        int minR = Integer.MAX_VALUE, minC = Integer.MAX_VALUE;
+        int maxR = -1, maxC = -1;
+
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+                if (tiles[r][c].getType() == TileType.WATER) {
+                    if (r < minR) minR = r;
+                    if (r > maxR) maxR = r;
+                    if (c < minC) minC = c;
+                    if (c > maxC) maxC = c;
+                }
+
+        if (maxR == -1) return;
+
+        int x = minC * ts - cam.x;
+        int y = minR * ts - cam.y;
+        int w = (maxC - minC + 1) * ts;
+        int h = (maxR - minR + 1) * ts;
+
+        g.drawImage(WATER_IMG, x, y, w, h, null);
     }
 
     public int getRows() { return rows; }
