@@ -8,6 +8,9 @@ import game.items.Seed;
 import game.items.Tool;
 import game.world.TileMap;
 import game.world.TilePos;
+import game.engine.ImageLoader;
+import java.awt.image.BufferedImage;
+
 
 import java.awt.*;
 
@@ -44,6 +47,8 @@ public class Player extends Entity {
     private int     animFrame = 0;
     private boolean moving    = false;
 
+    private BufferedImage front1, front2, back1, back2, left1, left2, right1, right2;
+
     public Player(KeyHandler key, TileMap tileMap) {
         super(
             GamePanel.TILE_SCALED * 5,  // x awal
@@ -60,6 +65,20 @@ public class Player extends Entity {
         this.stamina     = 100; this.maxStamina = 100;
         this.level       = 1;   this.exp        = 0;
         this.money       = 500;
+
+        // Texture
+        back1  = ImageLoader.load("resources/character/player/back.png");
+        back2  = ImageLoader.load("resources/character/player/back2.png");
+        front1 = ImageLoader.load("resources/character/player/front.png");
+        front2 = ImageLoader.load("resources/character/player/front1.png");
+        left1  = ImageLoader.load("resources/character/player/left.png");
+        left2  = ImageLoader.load("resources/character/player/left2.png");
+        right1 = ImageLoader.load("resources/character/player/right.png");
+        right2 = ImageLoader.load("resources/character/player/right1.png");
+
+
+
+
 
         // Item awal di inventory
         inventory.addItem(Tool.Hoe());
@@ -118,10 +137,15 @@ public class Player extends Entity {
 
             // Animasi
             if (moving) {
-                animTimer++;
-                if (animTimer >= 10) { animTimer = 0; animFrame = (animFrame + 1) % 4; }
-            } else {
-                animFrame = 0;
+                if (direction.equals("up")) {
+                    sprite = (animFrame % 2 == 0) ? back1 : back2;
+                } else if (direction.equals("down")) {
+                    sprite = (animFrame % 2 == 0) ? front1 : front2;
+                } else if (direction.equals("left")) {
+                    sprite = (animFrame % 2 == 0) ? left1 : left2;
+                } else if (direction.equals("right")) {
+                    sprite = (animFrame % 2 == 0) ? right1 : right2;
+                }
             }
 
             // 1-9 → pilih slot hotbar
