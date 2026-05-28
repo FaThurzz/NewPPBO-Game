@@ -6,6 +6,8 @@ import game.items.Inventory;
 import game.items.Item;
 import game.items.Seed;
 import game.items.Tool;
+import game.save.SaveData;
+import game.save.SaveManager;
 import game.world.TileMap;
 import game.world.TilePos;
 import game.engine.ImageLoader;
@@ -331,6 +333,34 @@ public class Player extends Entity {
 
     public void addMoney(int amount) {  // Math.max(0,...) mencegah uang jadi negatif
         money = Math.max(0, money + amount); }
+
+    public void loadFromSave(SaveData data) {
+        setX(data.playerX);
+        setY(data.playerY);
+        this.hp         = data.hp;
+        this.maxHp      = data.maxHp;
+        this.stamina    = data.stamina;
+        this.maxStamina = data.maxStamina;
+        this.level      = data.level;
+        this.exp        = data.exp;
+        this.money      = data.money;
+        if (data.hotbarData != null && !data.hotbarData.isEmpty()) {
+            inventory.clearAll(); // clear HANYA jika ada data valid yang mau di-load
+            String[] slots = data.hotbarData.split(";", -1);
+            for (int i = 0; i < slots.length && i < Inventory.HOTBAR_SIZE; i++) {
+                Item item = SaveManager.deserializeItem(slots[i]);
+                if (item != null) inventory.setHotbarSlot(i, item);
+            }
+        }
+
+        if (data.backpackData != null && !data.backpackData.isEmpty()) {
+            String[] slots = data.backpackData.split(";", -1);
+            for (int i = 0; i < slots.length && i < Inventory.BACKPACK_SIZE; i++) {
+                Item item = SaveManager.deserializeItem(slots[i]);
+                if (item != null) inventory.setBackpackSlot(i, item);
+            }
+        }
+    }
 
     // ── Getters (Encapsulation) ────────────────────────────
     public int       getHp()         { return hp; }

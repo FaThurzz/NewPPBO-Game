@@ -1,5 +1,7 @@
 package game.world;
 
+import game.save.SaveData;
+
 /**
  * TIME SYSTEM — sistem waktu in-game
  * Konsep OOP: Encapsulation
@@ -115,6 +117,14 @@ public class TimeSystem {
             dayChangeListener.onDayChanged(day, season);
         }
     }
+
+    public void loadFromSave(SaveData data) {
+        this.day    = data.day;
+        this.season = Season.valueOf(data.season); // String → enum
+        this.hour   = 6;
+        this.minute = 0;
+    }
+
     // ── Setter listener ────────────────────────────────────
     public void setDayChangeListener(DayChangeListener listener) {
         this.dayChangeListener = listener;
