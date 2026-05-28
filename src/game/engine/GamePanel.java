@@ -5,6 +5,10 @@ import game.exception.InvalidMapException;
 import game.items.InventoryRenderer;
 import game.items.Item;
 import game.items.Tool;
+import game.menu.MainMenu;
+import game.menu.MenuRenderer;
+import game.save.SaveData;
+import game.save.SaveManager;
 import game.world.Camera;
 import game.world.TileMap;
 import game.world.TilePos;
@@ -46,6 +50,11 @@ public class GamePanel extends JPanel {
     private int     notifTimer   = 0;
     private static final int NOTIF_DURATION = 120; // 2 detik (120 frame)
 
+    private final GameStateManager gsm  = new GameStateManager();
+    private final MainMenu         menu = new MainMenu();
+    private long menuTick = 0; // untuk animasi menu
+
+
     public GamePanel() {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
@@ -73,6 +82,11 @@ public class GamePanel extends JPanel {
             System.out.println("Pagi hari! Stamina & HP pulih penuh.");
             System.out.println("Day " + newDay + " | " + season.getDisplayName());
         });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (gsm.is(GameStateManager.State.PLAYING)) {
+                SaveManager.save(player, timeSystem, mapManager); // ← ganti tileMap → mapManager
+            }
+        }));
     }
 
     /**
@@ -88,25 +102,87 @@ public class GamePanel extends JPanel {
     }
 
     private void update() {
-        player.update();
-        if (keyHandler.isEntranceJustPressed()) {
-            TilePos target = player.getFacingTile();
-            if (tileMap.isEntrance(target)) {
-                // sedang di overworld => masuk cave
-                if (mapManager.getCurrentMapType() == MapManager.MapType.OVERWORLD) {
-                    mapManager.enterCave(player);
-                } else {
-                    mapManager.exitCave(player);
+        if (gsm.is(GameStateManager.State.MAIN_MENU)) {
+            menuTick++;
+            handleMenuInput();
+
+        } else if (gsm.is(GameStateManager.State.PLAYING)) {
+            player.update();
+            timeSystem.update();
+
+            // Cek entrance — dipindah ke sini
+            if (keyHandler.isEntranceJustPressed()) {
+                TilePos target = player.getFacingTile();
+                if (tileMap.isEntrance(target)) {
+                    if (mapManager.getCurrentMapType() == MapManager.MapType.OVERWORLD) {
+                        mapManager.enterCave(player);
+                    } else {
+                        mapManager.exitCave(player);
+                    }
+                    tileMap = mapManager.getCurrentMap();
+                    player.setTileMap(tileMap);
+                    timeSystem.setTileMap(tileMap);
                 }
-                // update referensi tileMap di GamePanel dan TimeSystem
-                tileMap = mapManager.getCurrentMap();
-                player.setTileMap(tileMap);
-                timeSystem.setTileMap(tileMap); // lihat catatan di bawah
+            }
+
+            camera.follow(player, tileMap);
+            if (notifTimer > 0) notifTimer--;
+        }
+        // ← tidak ada apapun di sini
+    }
+
+    private void handleMenuInput() {
+        if (keyHandler.isUpJust())   menu.navigateUp();
+        if (keyHandler.isDownJust()) menu.navigateDown();
+
+        if (keyHandler.isActionJustPressed() || keyHandler.isEntranceJustPressed()) {
+            GameStateManager.State next = menu.confirm();
+            gsm.setState(next);
+
+            // Jika mulai bermain, cek apakah load save atau new game
+            if (next == GameStateManager.State.PLAYING) {
+                initGame();
             }
         }
-        camera.follow(player, tileMap);
-        timeSystem.update();
-        if (notifTimer > 0) notifTimer--;
+
+        // Selalu panggil tick agar justPressed terhitung
+        keyHandler.tick();
+    }
+
+    private void initGame() {
+        SaveData data = SaveManager.load();
+        if (data.valid) {
+            player.loadFromSave(data);
+            timeSystem.loadFromSave(data);
+
+            // Load state overworld
+            TileMap overworld = mapManager.getOverworldMap();
+            if (!data.overworldTiles.isEmpty()) overworld.deserializeTiles(data.overworldTiles);
+            if (!data.overworldFarm.isEmpty())  overworld.loadFarmData(data.overworldFarm);
+
+            // Load state cave
+            TileMap cave = mapManager.getCaveMap();
+            if (!data.caveTiles.isEmpty()) cave.deserializeTiles(data.caveTiles);
+            if (!data.caveFarm.isEmpty())  cave.loadFarmData(data.caveFarm);
+
+            // Kembalikan ke map yang aktif saat save
+            if ("CAVE".equals(data.currentMap)) {
+                // Player save di cave → spawn di entrance cave
+                mapManager.setCurrentMap(MapManager.MapType.CAVE);
+                tileMap = mapManager.getCaveMap();
+            } else {
+                // Default → overworld
+                mapManager.setCurrentMap(MapManager.MapType.OVERWORLD);
+                tileMap = mapManager.getOverworldMap();
+            }
+
+            player.setTileMap(tileMap);
+            timeSystem.setTileMap(tileMap);
+
+            System.out.println("Melanjutkan game di: " + data.currentMap);
+        } else {
+            System.out.println("Memulai game baru...");
+        }
     }
 
     /**
@@ -123,44 +199,41 @@ public class GamePanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        // Nearest-neighbor scaling agar pixel art tidak blur
         g2.setRenderingHint(
                 RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         );
+        g2.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON
+        );
 
-        // 1. Render peta
-        tileMap.render(g2, camera);
-        // 2. Render player (Polymorphism: render() via interface Renderable)
-        player.render(g2, camera.x, camera.y);
-        // 3. HUD
-        renderHUD(g2);
-        // 4. Hotbar inventory (dari versi temanmu)
-        InventoryRenderer.renderHotbar(g2, player.getInventory());
-        InventoryRenderer.renderBackpack(g2, player.getInventory()); // ← HARUS PALING BAWAH
+        if (gsm.is(GameStateManager.State.MAIN_MENU)) {
+            // Hanya render menu
+            MenuRenderer.render(g2, menu, menuTick);
 
-        if (notifTimer > 0) {
-            // Hitung opacity: mulai solid, makin transparan menjelang habis
-            // notifTimer/NOTIF_DURATION menghasilkan 1.0 → 0.0
-            float alpha = Math.min(1f, notifTimer / 30f); // fade out di 30 frame terakhir
-            int   opacity = (int)(alpha * 220);
+        } else if (gsm.is(GameStateManager.State.PLAYING)) {
+            // Hanya render game
+            tileMap.render(g2, camera);
+            player.render(g2, camera.x, camera.y);
+            renderHUD(g2);
+            InventoryRenderer.renderHotbar(g2, player.getInventory());
+            InventoryRenderer.renderBackpack(g2, player.getInventory());
 
-            g2.setColor(new Color(0, 0, 0, opacity));
-            g2.fillRoundRect(
-                    GamePanel.SCREEN_WIDTH / 2 - 100,
-                    GamePanel.SCREEN_HEIGHT / 2 - 20,
-                    200, 36, 10, 10
-            );
-            g2.setColor(new Color(255, 220, 60, opacity));
-            g2.setFont(new Font("Courier New", Font.BOLD, 11));
-
-            // Center teks
-            FontMetrics fm = g2.getFontMetrics();
-            int textX = GamePanel.SCREEN_WIDTH  / 2 - fm.stringWidth(notifText) / 2;
-            int textY = GamePanel.SCREEN_HEIGHT / 2 + 4;
-            g2.drawString(notifText, textX, textY);
+            // Notifikasi
+            if (notifTimer > 0) {
+                float alpha   = Math.min(1f, notifTimer / 30f);
+                int   opacity = (int)(alpha * 220);
+                g2.setColor(new Color(0, 0, 0, opacity));
+                g2.fillRoundRect(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 20, 200, 36, 10, 10);
+                g2.setColor(new Color(255, 220, 60, opacity));
+                g2.setFont(new Font("Courier New", Font.BOLD, 11));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(notifText,
+                        SCREEN_WIDTH/2 - fm.stringWidth(notifText)/2,
+                        SCREEN_HEIGHT/2 + 4);
+            }
         }
-
         g2.dispose();
     }
 

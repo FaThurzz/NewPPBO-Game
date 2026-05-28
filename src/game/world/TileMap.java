@@ -358,4 +358,110 @@ public class TileMap {
         // → kalau hasPlant && watered: growStage++
         // → lalu watered direset ke false
     }
+    // Getter semua farmData untuk SaveManager
+    public FarmTile[][] getAllFarmData() {
+        return farmData;
+    }
+
+    // Load farmData dari save
+    public void loadFarmData(String savedFarm) {
+        if (savedFarm == null || savedFarm.isEmpty()) return;
+
+        String[] tiles = savedFarm.split(";");
+        int idx = 0;
+
+        for (int r = 0; r < rows && idx < tiles.length; r++) {
+            for (int c = 0; c < cols && idx < tiles.length; c++) {
+                String[] parts = tiles[idx++].split(",", -1);
+                // -1 agar split tidak buang trailing empty string
+                if (parts.length < 5) continue;
+
+                FarmTile f = farmData[r][c];
+                if ("1".equals(parts[0])) f.till();
+                if ("1".equals(parts[1])) f.water();
+                if ("1".equals(parts[2])) {
+                    String crop = parts[3];
+                    if (!crop.isEmpty()) f.plant(crop);
+                }
+                // Set growStage langsung lewat setter baru
+                try {
+                    f.setGrowStage(Integer.parseInt(parts[4]));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+    }
+    /**
+     * Serialisasi seluruh tipe tile menjadi string.
+     * Format: angka ID tile dipisah koma, baris dipisah titik koma
+     * Contoh: "0,0,1,2,0;0,4,4,0,0;..."
+     */
+    public String serializeTiles() {
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                // Cari ID dari tipe tile saat ini
+                TileType type = tiles[r][c].getType();
+                int id = tileTypeToId(type);
+                sb.append(id);
+                if (c < cols - 1) sb.append(",");
+            }
+            if (r < rows - 1) sb.append(";");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Muat kembali tipe tile dari string yang disimpan.
+     */
+    public void deserializeTiles(String data) {
+        if (data == null || data.isEmpty()) return;
+
+        String[] rowData = data.split(";");
+        for (int r = 0; r < rows && r < rowData.length; r++) {
+            String[] colData = rowData[r].split(",");
+            for (int c = 0; c < cols && c < colData.length; c++) {
+                try {
+                    int id = Integer.parseInt(colData[c].trim());
+                    TileType type = idToTileType(id);
+                    if (type != null) {
+                        // Buat tile baru dengan tipe yang tersimpan
+                        tiles[r][c] = new Tile(type, textureOf(type, r, c));
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+    }
+
+// ── Helper: konversi TileType ↔ ID ───────────────────────
+
+    private int tileTypeToId(TileType type) {
+        return switch (type) {
+            case GRASS         -> 0;
+            case STONE         -> 1;
+            case WATER         -> 2;
+            case DIRT          -> 3;
+            case FARMLAND      -> 4;
+            case PATH          -> 5;
+            case LOG           -> 6;
+            case ENTRANCE      -> 7;
+            case PASSABLESTONE -> 8;
+            case UNBREAKSTONE  -> 9;
+        };
+    }
+
+    private TileType idToTileType(int id) {
+        return switch (id) {
+            case 0 -> TileType.GRASS;
+            case 1 -> TileType.STONE;
+            case 2 -> TileType.WATER;
+            case 3 -> TileType.DIRT;
+            case 4 -> TileType.FARMLAND;
+            case 5 -> TileType.PATH;
+            case 6 -> TileType.LOG;
+            case 7 -> TileType.ENTRANCE;
+            case 8 -> TileType.PASSABLESTONE;
+            case 9 -> TileType.UNBREAKSTONE;
+            default -> null;
+        };
+    }
 }

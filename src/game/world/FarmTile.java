@@ -35,6 +35,9 @@ public class FarmTile {
 
     /** Apakah sudah siap panen? */
     public boolean isHarvestable() { return hasPlant && growStage >= 3; }
+    public void setGrowStage(int stage) {
+        this.growStage = stage;
+    }
 
     /** Reset tile setelah panen */
     public void reset() {

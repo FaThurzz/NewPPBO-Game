@@ -125,6 +125,20 @@ public class Inventory {
             }
         }
     }
+    public void clearAll() {
+        for (int i = 0; i < HOTBAR_SIZE;  i++) hotbar[i]   = null;
+        for (int i = 0; i < BACKPACK_SIZE; i++) backpack[i] = null;
+    }
+
+    /** Set item langsung ke slot hotbar tertentu (untuk load save) */
+    public void setHotbarSlot(int index, Item item) {
+        if (index >= 0 && index < HOTBAR_SIZE) hotbar[index] = item;
+    }
+
+    /** Set item langsung ke slot backpack tertentu (untuk load save) */
+    public void setBackpackSlot(int index, Item item) {
+        if (index >= 0 && index < BACKPACK_SIZE) backpack[index] = item;
+    }
     // ── Akses slot ────────────────────────────────────────
     public Item getActiveItem()        { return hotbar[activeIndex]; }
     public Item getItem(int i)         { return (i >= 0 && i < HOTBAR_SIZE) ? hotbar[i] : null; }

@@ -7,7 +7,6 @@ import game.exception.InvalidMapException;
 /**
  * MAP MANAGER — mengatur pergantian antar map
  * Konsep OOP: Encapsulation
- *
  * Tugasnya:
  * - simpan map overworld dan cave
  * - tentukan map yang sedang aktif
@@ -95,7 +94,11 @@ public class MapManager {
 
         System.out.println("Keluar dari cave!");
     }
-
+    public void setCurrentMap(MapType type) {
+        this.currentMapType = type;
+        this.currentMap     = (type == MapType.CAVE) ? caveMap : overworldMap;
+        this.currentMap.setMapType(type);
+    }
 
     // ── Getters ─────────────────────────────────────────────
     public TileMap getCurrentMap()     { return currentMap; }
