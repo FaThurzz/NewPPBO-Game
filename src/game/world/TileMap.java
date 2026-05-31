@@ -343,6 +343,7 @@ public class TileMap {
             }
         }
         renderWaterAsOne(g, cam);
+        renderShopAsOne(g, cam);
     }
 
     private void renderWaterAsOne(Graphics2D g, Camera cam) {
@@ -368,6 +369,32 @@ public class TileMap {
         int h = (maxR - minR + 1) * ts;
 
         g.drawImage(WATER_IMG, x, y, w, h, null);
+    }
+
+
+    private void renderShopAsOne(Graphics2D g, Camera cam) {
+        if (SHOP_IMG == null) return;
+        int ts = GamePanel.TILE_SCALED;
+        int minR = Integer.MAX_VALUE, minC = Integer.MAX_VALUE;
+        int maxR = -1, maxC = -1;
+
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+                if (tiles[r][c].getType() == TileType.SHOP) {
+                    if (r < minR) minR = r;
+                    if (r > maxR) maxR = r;
+                    if (c < minC) minC = c;
+                    if (c > maxC) maxC = c;
+                }
+
+        if (maxR == -1) return;
+
+        int x = minC * ts - cam.x;
+        int y = minR * ts - cam.y;
+        int w = (maxC - minC + 1) * ts;
+        int h = (maxR - minR + 1) * ts;
+
+        g.drawImage(SHOP_IMG, x, y, w, h, null);
     }
 
     public int getRows() { return rows; }
