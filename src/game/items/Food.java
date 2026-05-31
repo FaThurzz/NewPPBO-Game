@@ -2,6 +2,7 @@ package game.items;
 
 import game.entity.Player;
 import game.world.TileMap;
+import game.engine.ImageLoader;
 
 /**
  * FOOD — makanan yang restore HP dan stamina, bisa punya buff
@@ -19,6 +20,11 @@ public class Food extends Item {
                 String buffType, int buffDuration,
                 int sellPrice, int buyPrice) {
         super(name, description, ItemType.FOOD, 99, sellPrice, buyPrice);
+        this.icon = ImageLoader.load("items/foods/"
+                + name.toLowerCase().replace(" ", "_") + ".png");
+        System.out.println("Loading icon: items/foods/"
+                + name.toLowerCase().replace(" ", "_") + ".png"
+                + " → " + (this.icon != null ? "BERHASIL" : "GAGAL"));
         this.hpRestore      = hpRestore;
         this.staminaRestore = staminaRestore;
         this.buffType       = buffType;
