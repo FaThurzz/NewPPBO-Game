@@ -37,4 +37,8 @@ public class Food extends Item {
         quantity--;
         System.out.println("Makan " + name + " | HP +" + hpRestore + " | Stamina +" + staminaRestore);
     }
+    public int    getHpRestore()      { return hpRestore; }
+    public int    getStaminaRestore() { return staminaRestore; }
+    public String getBuffType()       { return buffType; }
+    public int    getBuffDuration()   { return buffDuration; }
 }

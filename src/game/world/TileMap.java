@@ -34,6 +34,8 @@ public class TileMap {
             ImageLoader.load("resources/items/worlds/cave/stone_passable_a.png");
     private static final BufferedImage PASSSTONE_B_IMG =
             ImageLoader.load("resources/items/worlds/cave/stone_passable_b.png");
+    private static final BufferedImage SHOP_IMG =
+            ImageLoader.load("resources/items/worlds/overworld/shop.png");
 
     private static final int[][] DEFAULT_MAP = {
         {0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0},
@@ -43,8 +45,8 @@ public class TileMap {
         {0,0,0,0,0,0,0,0,0,1,4,4,1,0,0,6,6,0,0,0},
         {0,0,0,4,4,4,0,0,0,1,4,4,1,0,0,0,0,0,0,0},
         {0,0,0,4,4,4,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,0},
+        {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
         {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
@@ -69,7 +71,7 @@ public class TileMap {
     private static final TileType[] TYPE_MAP = {
         TileType.GRASS, TileType.STONE, TileType.WATER,
         TileType.DIRT,  TileType.FARMLAND, TileType.PATH, TileType.LOG, TileType.ENTRANCE,
-        TileType.PASSABLESTONE, TileType.UNBREAKSTONE
+        TileType.PASSABLESTONE, TileType.UNBREAKSTONE, TileType.SHOP
     };
 
     /** Constructor normal — bisa throw InvalidMapException */
@@ -153,6 +155,7 @@ public class TileMap {
             case ENTRANCE -> ENTRANCE_IMG;
             case UNBREAKSTONE -> STONEUNBREAK_IMG;
             case PASSABLESTONE -> ((row + col) & 1) == 0 ? PASSSTONE_A_IMG : PASSSTONE_B_IMG;
+            case SHOP -> SHOP_IMG;
         };
     }
 
@@ -275,6 +278,31 @@ public class TileMap {
         int c = pos.getCol();
         if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
         return tiles[r][c].getType() == TileType.ENTRANCE;
+    }
+
+    /**
+     * Cek apakah posisi (playerX, playerY) dalam pixel
+     * berada dalam jarak 1 tile dari tile SHOP manapun.
+     * Cara kerja:
+     * 1. Konversi posisi pixel player ke koordinat tile
+     * 2. Cek tile-tile di sekitar player (radius 1)
+     * 3. Jika ada tile SHOP di sekitarnya → return true
+     */
+    public boolean isNearShop(int playerX, int playerY) {
+        int ts      = GamePanel.TILE_SCALED;
+        int playerCol = playerX / ts;
+        int playerRow = playerY / ts;
+
+        // Cek radius 1 tile di sekitar player (termasuk diagonal)
+        for (int dr = -1; dr <= 1; dr++) {
+            for (int dc = -1; dc <= 1; dc++) {
+                int r = playerRow + dr;
+                int c = playerCol + dc;
+                if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
+                if (tiles[r][c].getType() == TileType.SHOP) return true;
+            }
+        }
+        return false;
     }
 
     /** Gambar overlay di atas tile pertanian (tilled, watered, tanaman) */
@@ -446,6 +474,7 @@ public class TileMap {
             case ENTRANCE      -> 7;
             case PASSABLESTONE -> 8;
             case UNBREAKSTONE  -> 9;
+            case SHOP -> 10;
         };
     }
 
@@ -461,6 +490,7 @@ public class TileMap {
             case 7 -> TileType.ENTRANCE;
             case 8 -> TileType.PASSABLESTONE;
             case 9 -> TileType.UNBREAKSTONE;
+            case 10 -> TileType.SHOP;
             default -> null;
         };
     }

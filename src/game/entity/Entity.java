@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 /**
  * ABSTRACT CLASS: Entity
- *
  * Konsep OOP:
  * 1. Abstract Class  — tidak bisa di-instansiasi langsung
  * 2. Inheritance     — Player mewarisi semua field dan method di sini

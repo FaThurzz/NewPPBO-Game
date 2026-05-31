@@ -16,7 +16,8 @@ public enum TileType {
     FARMLAND(true,  new Color(100, 70,  40)),
     PATH    (true,  new Color(180, 160, 100)),
     UNBREAKSTONE(false, new Color(52, 52, 52)),
-    PASSABLESTONE(true, new Color(83, 82, 82));
+    PASSABLESTONE(true, new Color(83, 82, 82)),
+    SHOP(false, new Color(180, 120, 60));
 
     private final boolean passable;
     private final Color   color;

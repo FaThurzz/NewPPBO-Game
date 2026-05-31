@@ -9,6 +9,8 @@ import game.menu.MainMenu;
 import game.menu.MenuRenderer;
 import game.save.SaveData;
 import game.save.SaveManager;
+import game.store.Store;
+import game.store.StoreRenderer;
 import game.world.Camera;
 import game.world.TileMap;
 import game.world.TilePos;
@@ -53,7 +55,8 @@ public class GamePanel extends JPanel {
     private final GameStateManager gsm  = new GameStateManager();
     private final MainMenu         menu = new MainMenu();
     private long menuTick = 0; // untuk animasi menu
-
+    private Store store;
+    private boolean nearShop = false;
 
     public GamePanel() {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -75,13 +78,11 @@ public class GamePanel extends JPanel {
         player = new Player(keyHandler, tileMap);
         timeSystem = new TimeSystem(tileMap);
         timeSystem.setDayChangeListener((newDay, season) -> {
-            // Stamina & HP pulih penuh setiap pagi
-            // Math.min memastikan tidak melebihi nilai maksimum
             player.setStamina(player.getMaxStamina());
             player.setHp(player.getMaxHp());
-            System.out.println("Pagi hari! Stamina & HP pulih penuh.");
-            System.out.println("Day " + newDay + " | " + season.getDisplayName());
+            store.buildCatalog(season);
         });
+        store = new Store(timeSystem.getSeason());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (gsm.is(GameStateManager.State.PLAYING)) {
                 SaveManager.save(player, timeSystem, mapManager); // ← ganti tileMap → mapManager
@@ -107,28 +108,46 @@ public class GamePanel extends JPanel {
             handleMenuInput();
 
         } else if (gsm.is(GameStateManager.State.PLAYING)) {
-            player.update();
-            timeSystem.update();
+            // Cek apakah toko sedang terbuka
+            if (store.isOpen()) {
+                // ── Toko terbuka → input untuk navigasi toko ──
+                keyHandler.tick();
+                if (keyHandler.isUpJust())            store.navigateUp();
+                if (keyHandler.isDownJust())          store.navigateDown();
+                if (keyHandler.isActionJustPressed()) store.buySelected(player);
+                if (keyHandler.isShopJustPressed())   store.close(); // B untuk tutup
 
-            // Cek entrance — dipindah ke sini
-            if (keyHandler.isEntranceJustPressed()) {
-                TilePos target = player.getFacingTile();
-                if (tileMap.isEntrance(target)) {
-                    if (mapManager.getCurrentMapType() == MapManager.MapType.OVERWORLD) {
-                        mapManager.enterCave(player);
-                    } else {
-                        mapManager.exitCave(player);
-                    }
-                    tileMap = mapManager.getCurrentMap();
-                    player.setTileMap(tileMap);
-                    timeSystem.setTileMap(tileMap);
+
+            } else {
+                // ── Toko tertutup → input normal ──
+                player.update(); // key.tick() sudah ada di dalam Player.update()
+
+                // Cek proximity ke toko setiap frame
+                nearShop = tileMap.isNearShop(player.getX(), player.getY());
+
+                // Buka toko HANYA jika player dekat tile SHOP
+                if (nearShop && keyHandler.isShopJustPressed()) {
+                    store.open();
                 }
-            }
-
-            camera.follow(player, tileMap);
-            if (notifTimer > 0) notifTimer--;
+                // Cek perpindahan map (entrance)
+                if (keyHandler.isEntranceJustPressed()) {
+                    TilePos target = player.getFacingTile();
+                    if (tileMap.isEntrance(target)) {
+                        if (mapManager.getCurrentMapType() == MapManager.MapType.OVERWORLD) {
+                            mapManager.enterCave(player);
+                        } else {
+                            mapManager.exitCave(player);
+                        }
+                        tileMap = mapManager.getCurrentMap();
+                        player.setTileMap(tileMap);
+                        timeSystem.setTileMap(tileMap);
+                    }
+                }
         }
-        // ← tidak ada apapun di sini
+            camera.follow(player, tileMap);
+            timeSystem.update();
+            if (notifTimer > 0) notifTimer--;
+    }
     }
 
     private void handleMenuInput() {
@@ -219,6 +238,12 @@ public class GamePanel extends JPanel {
             renderHUD(g2);
             InventoryRenderer.renderHotbar(g2, player.getInventory());
             InventoryRenderer.renderBackpack(g2, player.getInventory());
+            // ── Indikator proximity toko ──────────────────────────
+            // Muncul saat player dekat toko dan toko belum terbuka
+            if (nearShop && !store.isOpen()) {
+                renderShopPrompt(g2);
+            }
+            StoreRenderer.render(g2, store, player);
 
             // Notifikasi
             if (notifTimer > 0) {
@@ -350,4 +375,38 @@ public class GamePanel extends JPanel {
         g2.drawString("06:00", barX, 82);
         g2.drawString("22:00", barX + barW - 28, 82);
     }
+
+    private void renderShopPrompt(Graphics2D g2) {
+        String text = "[B] Masuk Toko";
+
+        // Hitung posisi di atas kepala player
+        int screenX = player.getX() - camera.x;
+        int screenY = player.getY() - camera.y;
+
+        // Background prompt
+        g2.setFont(new Font("Courier New", Font.BOLD, 10));
+        FontMetrics fm  = g2.getFontMetrics();
+        int         tw  = fm.stringWidth(text);
+        int         px  = screenX + GamePanel.TILE_SCALED / 2 - tw / 2 - 6;
+        int         py  = screenY - 24;
+        int         pw  = tw + 12;
+
+        // Clamp agar tidak keluar layar
+        px = Math.max(4, Math.min(px, SCREEN_WIDTH - pw - 4));
+        py = Math.max(4, py);
+
+        // Background gelap semi-transparan
+        g2.setColor(new Color(0, 0, 0, 180));
+        g2.fillRoundRect(px, py, pw, 16, 6, 6);
+
+        // Border kuning
+        g2.setColor(new Color(255, 220, 60, 200));
+        g2.setStroke(new BasicStroke(1f));
+        g2.drawRoundRect(px, py, pw, 16, 6, 6);
+
+        // Teks
+        g2.setColor(new Color(255, 240, 160));
+        g2.drawString(text, px + 6, py + 12);
+    }
+
 }

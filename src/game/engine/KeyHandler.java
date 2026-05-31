@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 /**
  * KEY HANDLER
  * Konsep OOP: Encapsulation
- *
  * Mendukung gerakan (WASD/Arrow), aksi (Z/Enter), jual (F),
  * dan slot inventory (1-9). Fitur "just pressed" mencegah aksi
  * terpicu berkali-kali selama tombol ditahan.
@@ -41,6 +40,11 @@ public class KeyHandler extends KeyAdapter {
     private boolean upWas  = false, downWas  = false;
     private boolean upJust = false, downJust = false;
 
+    // Shop Entrace
+    private boolean shop;
+    private boolean shopWasPressed  = false;
+    private boolean shopJustPressed = false;
+
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
@@ -52,6 +56,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_F                    -> sell   = true;
             case KeyEvent.VK_I -> inventoryPressed = true;
             case KeyEvent.VK_ENTER -> entrance = true;
+            case KeyEvent.VK_B -> shop = true;
             case KeyEvent.VK_1 -> slot[0] = true;
             case KeyEvent.VK_2 -> slot[1] = true;
             case KeyEvent.VK_3 -> slot[2] = true;
@@ -75,6 +80,7 @@ public class KeyHandler extends KeyAdapter {
             case KeyEvent.VK_F                    -> sell   = false;
             case KeyEvent.VK_I -> inventoryPressed = false;
             case KeyEvent.VK_ENTER -> entrance = false;
+            case KeyEvent.VK_B -> shop = false;
             case KeyEvent.VK_1 -> slot[0] = false;
             case KeyEvent.VK_2 -> slot[1] = false;
             case KeyEvent.VK_3 -> slot[2] = false;
@@ -104,6 +110,9 @@ public class KeyHandler extends KeyAdapter {
         inventoryJustPressed = inventoryPressed && !inventoryWasPressed;
         inventoryWasPressed  = inventoryPressed;
 
+        shopJustPressed = shop && !shopWasPressed;
+        shopWasPressed  = shop;
+
         upJust   = up   && !upWas;
         upWas    = up;
         downJust = down && !downWas;
@@ -122,4 +131,5 @@ public class KeyHandler extends KeyAdapter {
     public boolean isSlot(int i)         { return i >= 0 && i < 9 && slot[i]; }
     public boolean isUpJust()   { return upJust; }
     public boolean isDownJust() { return downJust; }
+    public boolean isShopJustPressed() { return shopJustPressed; }
 }
