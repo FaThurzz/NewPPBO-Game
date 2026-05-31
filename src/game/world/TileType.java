@@ -17,7 +17,8 @@ public enum TileType {
     PATH    (true,  new Color(180, 160, 100)),
     UNBREAKSTONE(false, new Color(52, 52, 52)),
     PASSABLESTONE(true, new Color(83, 82, 82)),
-    SHOP(false, new Color(180, 120, 60));
+    SHOP(false, new Color(180, 120, 60)),
+    HOUSE(false, new Color(207, 65, 133));
 
     private final boolean passable;
     private final Color   color;

@@ -1,5 +1,6 @@
 package game.world;
 
+import game.engine.Updatable;
 import game.save.SaveData;
 
 /**
@@ -13,7 +14,7 @@ import game.save.SaveData;
  *   28 hari   = 1 musim
  *   4 musim   = 1 tahun
  */
-public class TimeSystem {
+public class TimeSystem implements Updatable {
 
     // ── Waktu ──────────────────────────────────────────────
     private int hour   = 6;  // mulai jam 6 pagi
