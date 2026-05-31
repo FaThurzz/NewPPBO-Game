@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 
 /**
  * ABSTRACT CLASS: Item
- *
  * Konsep OOP:
  * 1. Abstract Class — cetakan dasar semua item
  * 2. Inheritance    — Crop, Food, Material, Seed, Tool extends Item

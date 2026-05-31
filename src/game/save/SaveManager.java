@@ -196,7 +196,7 @@ public class SaveManager {
                 };
             }
             case "CROP"     -> new Crop(name, 50, 10, true);
-            case "FOOD"     -> null; // tambahkan jika ada Food factory
+            case "FOOD" -> new Food(name, "", 50, 30, null, 0, 35, 0);
             case "MATERIAL" -> {
                 Material.Grade grade = Material.Grade.valueOf(
                         subtype.isEmpty() ? "COMMON" : subtype
