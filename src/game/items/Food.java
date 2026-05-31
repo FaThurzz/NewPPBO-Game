@@ -22,9 +22,6 @@ public class Food extends Item {
         super(name, description, ItemType.FOOD, 99, sellPrice, buyPrice);
         this.icon = ImageLoader.load("resources/items/foods/"
                 + name.toLowerCase().replace(" ", "_") + ".png");
-        System.out.println("Loading icon: items/foods/"
-                + name.toLowerCase().replace(" ", "_") + ".png"
-                + " → " + (this.icon != null ? "BERHASIL" : "GAGAL"));
         this.hpRestore      = hpRestore;
         this.staminaRestore = staminaRestore;
         this.buffType       = buffType;
