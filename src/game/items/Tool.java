@@ -91,10 +91,10 @@ public class Tool extends Item {
                     // di FarmTile. Switch expression mengembalikan objek Crop
                     // yang sesuai, atau Crop generik jika tidak dikenal.
                     Crop hasil = switch (farm.getCropType()) {
-                        case "Parsnip" -> new Crop("Parsnip", 35,  10, true);
-                        case "Melon"   -> new Crop("Melon",   250, 25, true);
-                        case "Pumpkin" -> new Crop("Pumpkin", 320, 30, true);
-                        default        -> new Crop(farm.getCropType(), 50, 10, true);
+                        case "Stroberi" -> new Crop("Stroberi", 150, 20, true);
+                        case "Carrot"   -> new Crop("Carrot",   100, 15, true);
+                        case "Potato"   -> new Crop("Potato",   120, 18, true);
+                        default         -> new Crop(farm.getCropType(), 50, 10, true);
                     };
 
                     // Coba masukkan hasil panen ke inventory player.
