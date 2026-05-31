@@ -78,9 +78,7 @@ public class Player extends Entity {
         right1 = ImageLoader.load("resources/character/player/right.png");
         right2 = ImageLoader.load("resources/character/player/right1.png");
 
-
-
-
+        sprite = front1;
 
         // Item awal di inventory
         inventory.addItem(Tool.Hoe());
