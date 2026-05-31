@@ -31,7 +31,7 @@ public class StoreRenderer {
 
         g.setColor(new Color(255, 220, 60));
         g.setFont(new Font("Courier New", Font.BOLD, 14));
-        g.drawString("🏪  Pierre's General Store", panelX + PADDING, panelY + 24);
+        g.drawString("Kaelithra's General Store", panelX + PADDING, panelY + 24);
 
         String moneyStr = "$" + player.getMoney();
         g.setFont(new Font("Courier New", Font.BOLD, 12));

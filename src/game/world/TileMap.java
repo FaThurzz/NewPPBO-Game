@@ -36,20 +36,22 @@ public class TileMap {
             ImageLoader.load("resources/items/worlds/cave/stone_passable_b.png");
     private static final BufferedImage SHOP_IMG =
             ImageLoader.load("resources/items/worlds/overworld/shop.png");
+    private static final BufferedImage HOUSE_IMG =
+            ImageLoader.load("resources/items/worlds/overworld/house.png");
 
     private static final int[][] DEFAULT_MAP = {
-        {0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,2,2,2,2,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,1,4,4,1,0,0,6,6,0,0,0},
-        {0,0,0,4,4,4,0,0,0,1,4,4,1,0,0,0,0,0,0,0},
-        {0,0,0,4,4,4,0,0,0,1,1,1,1,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,0},
-        {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
-        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+            {0,0,6,0,0,0,0,0,0,7,0,0,6,0,0,6,0,6,0,0}, // baris 0  — cave
+            {0,0,0,2,2,2,0,0,0,5,0,0,0,6,0,6,0,6,0,0}, // baris 1  — jalan + pohon kanan
+            {0,0,0,2,2,2,0,0,0,5,0,0,0,6,0,0,0,0,6,0}, // baris 2  — kolam + jalan + pohon
+            {0,0,0,0,0,0,0,0,0,5,0,0,0,0,6,0,6,0,0,0}, // baris 3  — kolam + farm + jalan + pohon
+            {0,0,4,4,4,4,4,0,0,5,0,0,0,0,0,6,0,0,6,0}, // baris 4  — farm + jalan + pohon
+            {0,0,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,0}, // baris 5  — farm + jalan horizontal tengah
+            {0,0,4,4,4,4,4,0,0,5,0,0,0,0,0,0,0,0,0,0}, // baris 6  — farm + jalan
+            {0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0}, // baris 7  — jalan
+            {0,11,11,11,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0}, // baris 8  — rumah + jalan
+            {0,11,11,11,0,0,0,0,0,5,5,5,5,5,5,5,5,10,10,0}, // baris 9  — rumah + jalan horizontal bawah + market
+            {0,11,11,11,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0}, // baris 10 — rumah + jalan
+            {0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0}, // baris 11 — jalan
     };
     // 0=GRASS, 1=STONE, 2=WATER, 3=DIRT, 4=FARMLAND, 5=PATH
     private static final int[][] CAVE_MAP = {
@@ -71,7 +73,7 @@ public class TileMap {
     private static final TileType[] TYPE_MAP = {
         TileType.GRASS, TileType.STONE, TileType.WATER,
         TileType.DIRT,  TileType.FARMLAND, TileType.PATH, TileType.LOG, TileType.ENTRANCE,
-        TileType.PASSABLESTONE, TileType.UNBREAKSTONE, TileType.SHOP
+        TileType.PASSABLESTONE, TileType.UNBREAKSTONE, TileType.SHOP, TileType.HOUSE
     };
 
     /** Constructor normal — bisa throw InvalidMapException */
@@ -156,6 +158,7 @@ public class TileMap {
             case UNBREAKSTONE -> STONEUNBREAK_IMG;
             case PASSABLESTONE -> ((row + col) & 1) == 0 ? PASSSTONE_A_IMG : PASSSTONE_B_IMG;
             case SHOP -> SHOP_IMG;
+            case HOUSE -> HOUSE_IMG;
         };
     }
 
@@ -502,6 +505,7 @@ public class TileMap {
             case PASSABLESTONE -> 8;
             case UNBREAKSTONE  -> 9;
             case SHOP -> 10;
+            case HOUSE -> 11;
         };
     }
 
@@ -518,6 +522,7 @@ public class TileMap {
             case 8 -> TileType.PASSABLESTONE;
             case 9 -> TileType.UNBREAKSTONE;
             case 10 -> TileType.SHOP;
+            case 11 -> TileType.HOUSE;
             default -> null;
         };
     }

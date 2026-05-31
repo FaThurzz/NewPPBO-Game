@@ -377,7 +377,7 @@ public class GamePanel extends JPanel {
     }
 
     private void renderShopPrompt(Graphics2D g2) {
-        String text = "[B] Masuk Toko";
+        String text = "[B] Belanja";
 
         // Hitung posisi di atas kepala player
         int screenX = player.getX() - camera.x;
