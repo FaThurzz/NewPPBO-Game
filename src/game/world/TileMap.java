@@ -38,6 +38,9 @@ public class TileMap {
             ImageLoader.load("resources/items/worlds/overworld/shop.png");
     private static final BufferedImage HOUSE_IMG =
             ImageLoader.load("resources/items/worlds/overworld/house.png");
+    private static final BufferedImage CROP_STROBERI_IMG = ImageLoader.load("resources/items/seeds/Strawberry_Tanam.png");
+    private static final BufferedImage CROP_POTATO_IMG   = ImageLoader.load("resources/items/seeds/Potato_Tanam.png");
+    private static final BufferedImage CROP_WORTEL_IMG   = ImageLoader.load("resources/items/seeds/Wortel_Tanam.png");
 
     private static final int[][] DEFAULT_MAP = {
             {0,0,6,0,0,0,0,0,0,7,0,0,6,0,0,6,0,6,0,0}, // baris 0  — cave
@@ -322,10 +325,16 @@ public class TileMap {
 
         // Gambar tanaman sederhana jika ada
         if (farm.isHasPlant()) {
-            int stage = farm.getGrowStage();
-            g.setColor(stage >= 3 ? new Color(255, 200, 50) : new Color(80, 180, 80));
-            int ph = 8 + stage * 6; // makin tinggi sesuai stage
-            g.fillRect(x + size/2 - 3, y + size - ph - 4, 6, ph);
+            String cropType = farm.getCropType();
+            BufferedImage cropImg = switch (cropType != null ? cropType : "") {
+                case "Stroberi" -> CROP_STROBERI_IMG;
+                case "Potato"   -> CROP_POTATO_IMG;
+                case "Carrot"   -> CROP_WORTEL_IMG;
+                default         -> null;
+            };
+            if (cropImg != null) {
+                g.drawImage(cropImg, x, y, size, size, null);
+            }
         }
     }
 

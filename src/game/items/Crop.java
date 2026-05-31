@@ -1,5 +1,6 @@
 package game.items;
 
+import game.engine.ImageLoader;
 import game.entity.Player;
 import game.world.TileMap;
 
@@ -16,6 +17,7 @@ public class Crop extends Item {
         super(name, "Hasil panen segar.", ItemType.CROP, 99, sellPrice, 0);
         this.energy = energy;
         this.edible = edible;
+        this.icon = ImageLoader.load("resources/items/crops/Crop_" + name + ".png");
     }
 
     @Override public boolean isUsable() { return edible; }
