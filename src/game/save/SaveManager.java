@@ -105,7 +105,6 @@ public class SaveManager {
     /**
      * Format tiap item: "nama|qty|tipe|subtype"
      * Antar item dipisah ";"
-     *
      * Contoh hotbar:
      * "Hoe|1|TOOL|HOE;Watering Can|1|TOOL|WATERING_CAN;Stroberi|3|CROP|;"
      */

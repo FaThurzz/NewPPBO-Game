@@ -21,7 +21,6 @@ public abstract class Entity implements Renderable, Updatable {
     protected int width, height;
     protected int speed;
     protected BufferedImage sprite;
-    protected boolean active = true;
 
     protected Entity(int x, int y, int width, int height, int speed) {
         this.x      = x;
@@ -54,5 +53,4 @@ public abstract class Entity implements Renderable, Updatable {
 
     public void setX(int x)      { this.x = x; }
     public void setY(int y)      { this.y = y; }
-    public void setSpeed(int s)  { this.speed = s; }
 }

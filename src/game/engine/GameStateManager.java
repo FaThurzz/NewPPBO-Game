@@ -14,6 +14,5 @@ public class GameStateManager {
     private State current = State.MAIN_MENU; // mulai dari menu
 
     public void setState(State s) { current = s; }
-    public State getState()       { return current; }
     public boolean is(State s)    { return current == s; }
 }

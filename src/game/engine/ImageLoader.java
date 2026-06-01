@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ImageLoader {   // ← ini yang hilang/terhapus
+public class ImageLoader {
 
     public static BufferedImage load(String path) {
         try {
