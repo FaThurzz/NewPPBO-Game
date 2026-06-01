@@ -45,7 +45,6 @@ public class Player extends Entity {
 
     // ── Animasi ───────────────────────────────────────────
     private String  direction = "down";
-    private int     animTimer = 0;
     private int     animFrame = 0;
     private boolean moving    = false;
 
@@ -74,7 +73,7 @@ public class Player extends Entity {
         front1 = ImageLoader.load("resources/character/player/front.png");
         front2 = ImageLoader.load("resources/character/player/front1.png");
         left1  = ImageLoader.load("resources/character/player/left.png");
-        left2  = ImageLoader.load("resources/character/player/left2.png");
+        left2  = ImageLoader.load("resources/character/player/left1.png");
         right1 = ImageLoader.load("resources/character/player/right.png");
         right2 = ImageLoader.load("resources/character/player/right1.png");
 
@@ -299,7 +298,6 @@ public class Player extends Entity {
             return;
         }
         // Hitung total uang dari semua item di slot ini
-        // Contoh: 5 Parsnip × $35 = $175
         int total = active.getSellPrice() * active.getQuantity();
         // Tambah uang ke player
         addMoney(total);

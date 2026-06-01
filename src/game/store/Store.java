@@ -9,8 +9,6 @@ import java.util.List;
 /**
  * Toko tempat player membeli item.
  * Konsep OOP: Encapsulation
- * Katalog toko berubah berdasarkan musim —
- * benih yang dijual berbeda tiap musim.
  */
 public class Store {
 
@@ -23,10 +21,6 @@ public class Store {
         buildCatalog(currentSeason);
     }
 
-    /**
-     * Bangun katalog berdasarkan musim saat ini.
-     * Dipanggil ulang saat musim berganti.
-     */
     public void buildCatalog(Season season) {
         catalog.clear();
 

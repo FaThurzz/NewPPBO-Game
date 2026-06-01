@@ -24,10 +24,10 @@ import java.awt.*;
  * GAME PANEL — koordinator utama
  * Konsep OOP: Encapsulation
  * Merge:
- * - Game loop pakai javax.swing.Timer (dari versi simplified — lebih mudah dipahami)
- * - Camera dari world.Camera (dari versi temanmu)
- * - InventoryRenderer hotbar (dari versi temanmu)
- * - HUD HP + Stamina + Level + Money (gabungan keduanya)
+ * - Game loop pakai javax.swing.Timer
+ * - Camera dari world.Camera
+ * - InventoryRenderer hotbar
+ * - HUD HP + Stamina + Level + Money
  */
 public class GamePanel extends JPanel {
 
@@ -120,7 +120,7 @@ public class GamePanel extends JPanel {
 
             } else {
                 // ── Toko tertutup → input normal ──
-                player.update(); // key.tick() sudah ada di dalam Player.update()
+                player.update();
 
                 // Cek proximity ke toko setiap frame
                 nearShop = tileMap.isNearShop(player.getX(), player.getY());
@@ -204,15 +204,6 @@ public class GamePanel extends JPanel {
         }
     }
 
-    /**
-     * Tampilkan teks notifikasi di tengah layar selama 2 detik.
-     * Timer dihitung mundur tiap frame, notif hilang saat = 0.
-     */
-    public void showNotif(String text) {
-        notifText  = text;
-        notifTimer = NOTIF_DURATION;
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -238,7 +229,6 @@ public class GamePanel extends JPanel {
             renderHUD(g2);
             InventoryRenderer.renderHotbar(g2, player.getInventory());
             InventoryRenderer.renderBackpack(g2, player.getInventory());
-            // ── Indikator proximity toko ──────────────────────────
             // Muncul saat player dekat toko dan toko belum terbuka
             if (nearShop && !store.isOpen()) {
                 renderShopPrompt(g2);
