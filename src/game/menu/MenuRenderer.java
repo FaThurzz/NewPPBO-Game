@@ -1,9 +1,11 @@
 package game.menu;
 
 import game.engine.GamePanel;
+import game.engine.ImageLoader;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Menggambar tampilan menu utama.
@@ -11,50 +13,75 @@ import java.awt.geom.RoundRectangle2D;
  */
 public class MenuRenderer {
 
+    private static final BufferedImage BG_IMAGE =
+            ImageLoader.load("resources/menu/Background.png");
+    private static final BufferedImage TITLE_IMAGE =
+            ImageLoader.load("resources/menu/Title.png");
+
     public static void render(Graphics2D g, MainMenu menu, long tick) {
         int W = GamePanel.SCREEN_WIDTH;
         int H = GamePanel.SCREEN_HEIGHT;
 
-        // ── Background gradasi gelap ──────────────────────
-        GradientPaint bg = new GradientPaint(
-                0, 0,   new Color(10, 30, 15),   // atas: hijau sangat gelap
-                0, H,   new Color(5,  15, 30)    // bawah: biru tua
-        );
-        g.setPaint(bg);
-        g.fillRect(0, 0, W, H);
+        // ── Background: gambar jika ada, gradasi jika tidak ──
+        if (BG_IMAGE != null) {
+            // Gambar background distretch memenuhi layar 768x576
+            g.drawImage(BG_IMAGE, 0, 0, W, H, null);
 
-        // ── Bintang-bintang kecil (dekorasi) ─────────────
-        drawStars(g, W, H, tick);
+            // Overlay gelap tipis agar teks tetap terbaca
+            g.setColor(new Color(0, 0, 0, 80));
+            g.fillRect(0, 0, W, H);
+        } else {
+            // Fallback gradasi kalau gambar tidak ditemukan
+            GradientPaint bg = new GradientPaint(
+                    0, 0, new Color(10, 30, 15),
+                    0, H, new Color(5,  15, 30)
+            );
+            g.setPaint(bg);
+            g.fillRect(0, 0, W, H);
+            drawStars(g, W, H, tick);
+        }
 
-        // ── Judul game ───────────────────────────────────
+        // Judul dan panel menu tetap sama
         drawTitle(g, W, tick);
-
-        // ── Panel menu ───────────────────────────────────
         drawMenuPanel(g, menu, W, H);
 
-        // ── Footer ───────────────────────────────────────
         g.setColor(new Color(100, 100, 100));
         g.setFont(new Font("Courier New", Font.PLAIN, 9));
         g.drawString("↑↓ Navigasi   Enter / Z Pilih", W / 2 - 80, H - 10);
     }
 
-    // ── Judul dengan efek "berkedip" ──────────────────────
+    // Ganti seluruh method drawTitle():
     private static void drawTitle(Graphics2D g, int W, long tick) {
-        // Shadow judul
-        g.setFont(new Font("Courier New", Font.BOLD, 36));
-        g.setColor(new Color(0, 0, 0, 150));
-        g.drawString("Meadow Tales", W / 2 - 142, 122);
+        if (TITLE_IMAGE != null) {
+            // Tentukan ukuran tampil gambar judul
+            int titleW = (int)(TITLE_IMAGE.getWidth() * 0.45);
+            int titleH = (int)(TITLE_IMAGE.getHeight() * 0.45);
 
-        // Judul utama dengan warna beranimasi
-        float hue = (tick % 300) / 300f; // warna berputar pelan
-        Color titleColor = Color.getHSBColor(0.35f + hue * 0.05f, 0.6f, 1.0f);
-        g.setColor(titleColor);
-        g.drawString("Meadow Tales", W / 2 - 140, 120);
+            // Posisi: tengah horizontal, 60px dari atas
+            int drawX = W / 2 - titleW / 2;
+            int drawY = -10;
 
-        // Subtitle
-        g.setFont(new Font("Courier New", Font.ITALIC, 12));
-        g.setColor(new Color(150, 200, 150));
-        g.drawString("~ A Simple Farming Adventure ~", W / 2 - 110, 145);
+            // Efek animasi naik-turun pelan (opsional)
+            double bob = Math.sin(tick * 0.04) * 4; // naik turun ±4px
+            drawY += (int) bob;
+
+            g.drawImage(TITLE_IMAGE, drawX, drawY, titleW, titleH, null);
+
+        } else {
+            // Fallback ke teks biasa kalau gambar tidak ada
+            g.setFont(new Font("Courier New", Font.BOLD, 36));
+            g.setColor(new Color(0, 0, 0, 150));
+            g.drawString("Meadow Tales", W / 2 - 142, 122);
+
+            float hue = (tick % 300) / 300f;
+            Color titleColor = Color.getHSBColor(0.35f + hue * 0.05f, 0.6f, 1.0f);
+            g.setColor(titleColor);
+            g.drawString("Meadow Tales", W / 2 - 140, 120);
+
+            g.setFont(new Font("Courier New", Font.ITALIC, 12));
+            g.setColor(new Color(150, 200, 150));
+            g.drawString("~ A Simple Farming Adventure ~", W / 2 - 110, 145);
+        }
     }
 
     // ── Panel pilihan menu ────────────────────────────────
@@ -62,7 +89,7 @@ public class MenuRenderer {
         int panelW = 220;
         int panelH = 140;
         int panelX = W / 2 - panelW / 2;
-        int panelY = H / 2 - 20;
+        int panelY = H / 2 + 40;
 
         // Background panel
         g.setColor(new Color(10, 25, 15, 200));
